@@ -17,6 +17,11 @@ on:
       - "**.py"
   workflow_dispatch:
 
+# 环境变量定义，用于统一管理依赖版本
+env:
+  MAA_FRAMEWORK_VERSION: "v5.2.6"
+  MFA_AVALONIA_VERSION: "v2.2.1"
+
 permissions:
   contents: write
   actions: write
@@ -85,7 +90,7 @@ jobs:
         with:
           repository: MaaXYZ/MaaFramework
           fileName: "MAA-win-${{ matrix.arch }}*"
-          tag: "v4.5.3"
+          tag: ${{ env.MAA_FRAMEWORK_VERSION }}
           out-file-path: "deps"
           extract: true
 
@@ -95,7 +100,7 @@ jobs:
         with:
           repository: SweetSmellFox/MFAAvalonia
           fileName: "MFAAvalonia-*-win-x64*"
-          tag: "v1.6.9"
+          tag: ${{ env.MFA_AVALONIA_VERSION }}
           out-file-path: "MFA"
           extract: true
 
@@ -151,7 +156,7 @@ jobs:
         with:
           repository: MaaXYZ/MaaFramework
           fileName: "MAA-linux-${{ matrix.arch }}*"
-          tag: "v4.5.3"
+          tag: ${{ env.MAA_FRAMEWORK_VERSION }}
           preRelease: true
           out-file-path: "deps"
           extract: true
@@ -162,7 +167,7 @@ jobs:
         with:
           repository: SweetSmellFox/MFAAvalonia
           fileName: "MFAAvalonia-*-linux-${{ matrix.arch == 'x86_64' && 'x64' || 'arm64' }}*"
-          tag: "v1.6.9"
+          tag: ${{ env.MFA_AVALONIA_VERSION }}
           out-file-path: "MFA"
           extract: true
 
@@ -214,7 +219,7 @@ jobs:
         with:
           repository: MaaXYZ/MaaFramework
           fileName: "MAA-macos-${{ matrix.arch }}*"
-          tag: "v4.5.3"
+          tag: ${{ env.MAA_FRAMEWORK_VERSION }}
           out-file-path: "deps"
           extract: true
 
@@ -224,7 +229,7 @@ jobs:
         with:
           repository: SweetSmellFox/MFAAvalonia
           fileName: "MFAAvalonia-*-osx-${{ matrix.arch == 'x86_64' && 'x64' || 'arm64' }}*"
-          tag: "v1.6.9"
+          tag: ${{ env.MFA_AVALONIA_VERSION }}
           out-file-path: "MFA"
           extract: true
 

@@ -1,11 +1,9 @@
 {
     "Shop": {
         "next": [
-            "EntryUnionShop"
-        ],
-        "interrupt": [
-            "EntryUnion",
-            "ReturnBigMap"
+            "EntryUnionShop",
+            "[JumpBack]EntryUnion",
+            "[JumpBack]ReturnBigMap"
         ],
         "post_delay": 1000
     },

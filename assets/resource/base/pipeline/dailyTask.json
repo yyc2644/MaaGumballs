@@ -1,10 +1,8 @@
 {
     "DailyTask": {
         "next": [
-            "EntryEden"
-        ],
-        "interrupt": [
-            "ReturnBigMap"
+            "EntryEden",
+            "[JumpBack]ReturnBigMap"
         ],
         "timeout": 10000
     },
@@ -123,10 +121,8 @@
         "post_delay": 1000,
         "timeout": 2000,
         "next": [
-            "DailySweep_Start"
-        ],
-        "interrupt": [
-            "DailySweep_Entry"
+            "DailySweep_Start",
+            "[JumpBack]DailySweep_Entry"
         ]
     },
     "DailySweep_Entry": {
@@ -159,11 +155,9 @@
         "next": [
             "DailySweep_Fail",
             "DailySweep_Finish",
-            "DailySweep_Finish_1"
-        ],
-        "interrupt": [
-            "DailySweep_Confirm",
-            "DailySweep_BuyPower"
+            "DailySweep_Finish_1",
+            "[JumpBack]DailySweep_Confirm",
+            "[JumpBack]DailySweep_BuyPower"
         ],
         "timeout": 5000
     },
@@ -271,7 +265,7 @@
         "expected": "荒野探索中",
         "post_delay": 1000,
         "timeout": 2000,
-        "next": "BackText"
+        "next": ["BackText"]
     },
     "WildernessExplored": {
         "post_delay": 2000,
@@ -307,7 +301,7 @@
         "post_delay": 1000,
         "timeout": 2000,
         "action": "Click",
-        "next": "BackText"
+        "next": ["BackText"]
     },
     "SendLizards": {
         "recognition": "TemplateMatch",
@@ -332,7 +326,7 @@
             175,
             33
         ],
-        "next": "BackText"
+        "next": ["BackText"]
     },
     "SendLizards_start": {
         "post_delay": 1000,
@@ -391,7 +385,7 @@
             175,
             33
         ],
-        "next": "BackText"
+        "next": ["BackText"]
     },
     "AlchemySignboard_Start": {
         "recognition": "OCR",
@@ -613,7 +607,7 @@
         "action": "Click",
         "next": [
             "RuinsExplore_Nothing",
-            "Sub_RuinsExplore_Rubbish",
+            "[JumpBack]Sub_RuinsExplore_Rubbish",
             "RuinsExplore_EntryFight"
         ]
     },
@@ -636,7 +630,6 @@
         ]
     },
     "Sub_RuinsExplore_Rubbish": {
-        "is_sub": true,
         "recognition": "OCR",
         "expected": [
             "散落的物资"
@@ -665,7 +658,7 @@
         "post_delay": 1000,
         "timeout": 2000,
         "action": "Click",
-        "next": "RuinsExplore_Fight"
+        "next": ["RuinsExplore_Fight"]
     },
     "RuinsExplore_Fight": {
         "recognition": "OCR",
@@ -756,13 +749,11 @@
         ],
         "action": "Click",
         "next": [
-            "CircusTask_Finish"
-        ],
-        "interrupt": [
-            "BackText",
-            "PowerLack",
-            "ConfirmButton",
-            "ClickCenter"
+            "CircusTask_Finish",
+            "[JumpBack]BackText",
+            "[JumpBack]PowerLack",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]ClickCenter"
         ]
     },
     "CircusTask_Finish": {
@@ -779,10 +770,8 @@
             232
         ],
         "next": [
-            "CircusTask_ObtainReward"
-        ],
-        "interrupt": [
-            "BackText"
+            "CircusTask_ObtainReward",
+            "[JumpBack]BackText"
         ]
     },
     "CircusTask_ObtainReward": {
@@ -961,7 +950,7 @@
         "next": [
             "WeeklyRaid_Attack_Success"
         ],
-        "on_error": "TaskFailNotify"
+        "on_error": ["TaskFailNotify"]
     },
     "WeeklyRaid_Attack_Success": {
         "recognition": "OCR",

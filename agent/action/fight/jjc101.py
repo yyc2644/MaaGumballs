@@ -62,6 +62,8 @@ class JJC101(CustomAction):
                 context.tasker.controller.post_screencap().wait().get(),
             )
         ):
+            if RunResult.hit == False :
+                continue  
             tempLayers = fightUtils.extract_num_layer(RunResult.best_result.text)
             if context.tasker.stopping:
                 logger.info("检测到停止任务, 开始退出agent")
@@ -217,7 +219,7 @@ class JJC101(CustomAction):
         if (self.layers % 10 == 5 or self.layers % 10 == 4) and context.run_recognition(
             "JJC_Find_Abattoir",
             image,
-        ):
+        ).hit:
             logger.info(f"进入角斗场战斗！！！")
             context.run_task("JJC_Find_Abattoir")
             if self.layers <= 35:
@@ -255,7 +257,7 @@ class JJC101(CustomAction):
                     fightUtils.findItem("异域的灯芯", True, context, boss_x, boss_y)
             if context.run_recognition(
                 "Fight_Victory", context.tasker.controller.post_screencap().wait().get()
-            ):
+            ).hit:
                 context.run_task("Fight_Victory")
             time.sleep(2)
             context.run_task("JJC_Abattoir_Chest")
@@ -302,7 +304,7 @@ class JJC101(CustomAction):
             if context.run_recognition(
                 "Fight_CheckBossStatus",
                 context.tasker.controller.post_screencap().wait().get(),
-            ):
+            ).hit:
                 logger.info(f"当前层数 {self.layers} 已经击杀boss")
                 fightUtils.OpenNatureSwitch(False, context)
                 return True
@@ -389,14 +391,17 @@ class JJC101(CustomAction):
     @timing_decorator
     def handle_perfect_event(self, context: Context):
         # 检测完美击败
-        if not self.isHaveSpartanHat and context.run_recognition(
-            "Fight_Perfect", context.tasker.controller.post_screencap().wait().get()
+        if (
+            not self.isHaveSpartanHat
+            and context.run_recognition(
+                "Fight_Perfect", context.tasker.controller.post_screencap().wait().get()
+            ).hit
         ):
             logger.info(f"第{self.layers} 完美击败")
             while context.run_recognition(
                 "Fight_Perfect",
                 context.tasker.controller.post_screencap().wait().get(),
-            ):
+            ).hit:
                 pass
 
     @timing_decorator
@@ -406,7 +411,7 @@ class JJC101(CustomAction):
             # 检测三次斯巴达的头盔，检查到了就提前结束检查
             for _ in range(3):
                 img = context.tasker.controller.post_screencap().wait().get()
-                if context.run_recognition("JJC_Find_Body", img):
+                if context.run_recognition("JJC_Find_Body", img).hit:
                     context.run_task("JJC_Find_Body")
                     self.isHaveSpartanHat = True
                     logger.info("已有斯巴达头盔，或找到斯巴达头盔了！！")
@@ -418,7 +423,7 @@ class JJC101(CustomAction):
         if self.layers >= 40:
             return True
         # 打开技能商店
-        if context.run_recognition("Fight_SkillShop", image):
+        if context.run_recognition("Fight_SkillShop", image).hit:
             fightUtils.handle_skillShop_event(
                 context,
                 target_skill=[
@@ -436,7 +441,7 @@ class JJC101(CustomAction):
 
     @timing_decorator
     def handle_stone_event(self, context: Context, image):
-        if self.layers <= 29 and context.run_recognition("JJC_StoneChest", image):
+        if self.layers <= 29 and context.run_recognition("JJC_StoneChest", image).hit:
             context.run_task("JJC_StoneChest")
 
     def handle_auto_pickup_event(self, context: Context):
@@ -491,13 +496,13 @@ class JJC101(CustomAction):
         if context.run_recognition(
             "JJC_Inter_Confirm",
             image,
-        ):
+        ).hit:
             logger.info("检测到卡剧情, 本层重新探索")
             context.run_task("JJC_Inter_Confirm")
             return False
 
         # 检测卡返回
-        if context.run_recognition("BackText", image):
+        if context.run_recognition("BackText", image).hit:
             logger.info("检测到卡返回, 本层重新探索")
             context.run_task("Fight_ReturnMainWindow")
             return False
@@ -690,7 +695,7 @@ class JJC_CalEarning(CustomAction):
             context.tasker.controller.post_click(360, 640).wait()
             if context.run_recognition(
                 "ConfirmButton", context.tasker.controller.post_screencap().wait().get()
-            ):
+            ).hit:
                 context.run_task("ConfirmButton")
                 break
         image = context.tasker.controller.post_screencap().wait().get()
@@ -705,14 +710,15 @@ class JJC_CalEarning(CustomAction):
                 },
             },
         ):
-            EarningDetail = fightUtils.pair_by_distance(recoDetail.all_results, 400)
-            if EarningDetail["获得金币"]:
-                temp = int(EarningDetail["获得金币"]) // 10000
-                send_message(
-                    f"MaaGB",
-                    f"获得金币: {temp}w",
-                )
-            logger.info(EarningDetail)
+            if recoDetail.hit:
+                EarningDetail = fightUtils.pair_by_distance(recoDetail.all_results, 400)
+                if EarningDetail["获得金币"]:
+                    temp = int(EarningDetail["获得金币"]) // 10000
+                    send_message(
+                        f"MaaGB",
+                        f"获得金币: {temp}w",
+                    )
+                logger.info(EarningDetail)
 
         context.run_task("ReturnBigMap")
         time.sleep(3)

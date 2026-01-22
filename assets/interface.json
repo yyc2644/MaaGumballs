@@ -4,6 +4,7 @@
     "mirrorchyan_rid": "MaaGB",
     "mirrorchyan_multiplatform": true,
     "mfa_max_version": "1.6.9",
+    "interface_version": 2,
     "controller": [
         {
             "name": "ADB 默认方式",
@@ -334,11 +335,13 @@
             "repeat_count": 1,
             "option": [
                 "自动肉鸽时使用钻石购买体力",
-                "是否启用手记开启恶魔系称号",
+                "是否启用名导心得",
                 "目标出图楼层",
                 "目标大地数量",
                 "开启自动拾取",
-                "魔法系冈布奥选择"
+                "魔法系冈布奥选择",
+                "是否手动结算",
+                "是否启用手记开启恶魔系称号"
             ],
             "pipeline_override": {
                 "Select_WorldTree_InputBox_Text": {
@@ -938,6 +941,47 @@
                     "name": "yes",
                     "pipeline_override": {
                         "Mars_Astrological_Title_Setting": {
+                            "expected": "true"
+                        }
+                    }
+                }
+            ]
+        },
+        "是否手动结算": {
+            "default_case": "no",
+            "cases": [
+                {
+                    "name": "no",
+                    "pipeline_override": {
+                        "Fight_ManualLeave": {
+                            "enabled": false
+                        }
+                    }
+                },
+                {
+                    "name": "yes",
+                    "pipeline_override": {
+                        "Fight_ManualLeave": {
+                            "enabled": true
+                        }
+                    }
+                }
+            ]
+        },
+        "是否启用名导心得": {
+            "cases": [
+                {
+                    "name": "no",
+                    "pipeline_override": {
+                        "Mars_Director_Title_Setting": {
+                            "expected": "false"
+                        }
+                    }
+                },
+                {
+                    "name": "yes",
+                    "pipeline_override": {
+                        "Mars_Director_Title_Setting": {
                             "expected": "true"
                         }
                     }

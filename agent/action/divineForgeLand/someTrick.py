@@ -17,7 +17,7 @@ class SaveLoad_little(CustomAction):
     ) -> CustomAction.RunResult:
         img = context.tasker.controller.post_screencap().wait().get()
         reco_inMaze = context.run_recognition("ConfirmEquipmentPack", img)
-        if reco_inMaze:
+        if reco_inMaze.hit:
             # 登出游戏
             logger.info("登出游戏")
             context.run_task("LogoutGame")
@@ -320,7 +320,7 @@ class PoolTrick_Test(CustomAction):
             click_job = context.tasker.controller.post_click(
                 searchpoolpos[0] + searchpoolpos[2] // 2,
                 searchpoolpos[1] + searchpoolpos[3] // 2,
-            )
+            ).wait()
             click_job.wait()
             time.sleep(0.1)
 
@@ -455,7 +455,7 @@ class SunlightTrick_Test(CustomAction):
             click_job = context.tasker.controller.post_click(
                 searchbodypos[0] + searchbodypos[2] // 2,
                 searchbodypos[1] + searchbodypos[3] // 2,
-            )
+            ).wait()
             click_job.wait()
             time.sleep(0.1)
 
@@ -586,7 +586,7 @@ class Find_Stove_Sequence_Test(CustomAction):
 
         logger.info("首先在当前页面查找装备...")
         image = context.tasker.controller.post_screencap().wait().get()
-        if context.run_recognition(equipment_action, image):
+        if context.run_recognition(equipment_action, image).hit:
             logger.info(f"在当前页识别到 {equipment_level} 星装备，正在点击...")
             find_equipment_detail = context.run_task(equipment_action)
             if find_equipment_detail.nodes:
@@ -600,7 +600,7 @@ class Find_Stove_Sequence_Test(CustomAction):
 
         for _ in range(10):
             image = context.tasker.controller.post_screencap().wait().get()
-            if context.run_recognition(equipment_action, image):
+            if context.run_recognition(equipment_action, image).hit:
                 logger.info(f"识别到 {equipment_level} 星装备，正在点击...")
                 find_equipment_detail = context.run_task(equipment_action)
                 if find_equipment_detail.nodes:
@@ -627,11 +627,11 @@ class Find_Stove_Sequence_Test(CustomAction):
         """
         time.sleep(pre_waiting)
         image = context.tasker.controller.post_screencap().wait().get()
-        while not context.run_recognition("Click_Select_Equipment", image):
+        while not context.run_recognition("Click_Select_Equipment", image).hit:
             time.sleep(0.5)
             image = context.tasker.controller.post_screencap().wait().get()
         image = context.tasker.controller.post_screencap().wait().get()
-        while not context.run_recognition("Click_Smelt_Equipment", image):
+        while not context.run_recognition("Click_Smelt_Equipment", image).hit:
             time.sleep(0.5)
             image = context.tasker.controller.post_screencap().wait().get()
             context.run_task("Click_Smelt_Equipment")
@@ -671,7 +671,7 @@ class Find_Stove_Sequence_Test(CustomAction):
         time.sleep(1)
         if auto_melt == 3:
             image = context.tasker.controller.post_screencap().wait().get()
-            if context.run_recognition("CheckFirstEquipmentLevel", image):
+            if context.run_recognition("CheckFirstEquipmentLevel", image).hit:
                 # 说明出现了第一格出现了4星装备,根据情况提前结束
                 logger.info("第一格出现了4星装备,提前结束")
                 return False
@@ -689,7 +689,7 @@ class Find_Stove_Sequence_Test(CustomAction):
                         "timeout": 1500,
                     }
                 },
-            ):
+            ).hit:
 
                 # 说明出现了第一格出现了空格，说明所有装备都熔完了,根据情况提前结束
                 logger.info("所有装备熔炼完毕")

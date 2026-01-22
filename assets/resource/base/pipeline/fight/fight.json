@@ -15,11 +15,9 @@
         "action": "Click",
         "threshold": 0.7,
         "next": [
-            "Fight_ClosedDoor"
-        ],
-        "interrupt": [
-            "Fight_DownStaris_Loading",
-            "ConfirmButton"
+            "Fight_ClosedDoor",
+            "[JumpBack]Fight_DownStaris_Loading",
+            "[JumpBack]ConfirmButton"
         ],
         "post_delay": 500,
         "timeout": 3000,
@@ -59,14 +57,12 @@
     },
     "Fight_LeaveMaze": {
         "next": [
-            "Fight_CalEarning"
-        ],
-        "interrupt": [
-            "Communicating",
-            "ConfirmButton",
-            "Fight_LeaveMaze_StopButton",
-            "Fight_LeaveMaze_Leave",
-            "BackText"
+            "Fight_CalEarning",
+            "[JumpBack]Communicating",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]Fight_LeaveMaze_StopButton",
+            "[JumpBack]Fight_LeaveMaze_Leave",
+            "[JumpBack]BackText"
         ]
     },
     "Fight_CalEarning": {
@@ -145,11 +141,9 @@
     },
     "Fight_ReturnMainWindow": {
         "next": [
-            "Fight_MainWindow"
-        ],
-        "interrupt": [
-            "BackText_500ms",
-            "GameLoading"
+            "Fight_MainWindow",
+            "[JumpBack]BackText_500ms",
+            "[JumpBack]GameLoading"
         ]
     },
     "Fight_MainWindow": {
@@ -216,7 +210,7 @@
         ],
         "action": "Click",
         "threshold": 0.8,
-        "post_delay": 150,
+        "post_delay": 250,
         "timeout": 2000
     },
     "Fight_SkillPack_Type": {
@@ -229,7 +223,7 @@
             225
         ],
         "action": "Click",
-        "post_delay": 150,
+        "post_delay": 200,
         "timeout": 2000
     },
     "Fight_ClickSpecialMagicPage": {
@@ -244,7 +238,7 @@
             "特殊"
         ],
         "action": "Click",
-        "post_delay": 150,
+        "post_delay": 200,
         "timeout": 2000
     },
     "Fight_ClickFireMagicPage": {
@@ -265,7 +259,7 @@
             91,
             78
         ],
-        "post_delay": 150,
+        "post_delay": 200,
         "timeout": 2000
     },
     "Fight_ClickWaterMagicPage": {
@@ -286,7 +280,7 @@
             85,
             70
         ],
-        "post_delay": 150,
+        "post_delay": 200,
         "timeout": 2000
     },
     "Fight_ClickEarthMagicPage": {
@@ -307,7 +301,7 @@
             77,
             64
         ],
-        "post_delay": 150,
+        "post_delay": 200,
         "timeout": 2000
     },
     "Fight_ClickQiMagicPage": {
@@ -328,7 +322,7 @@
             95,
             75
         ],
-        "post_delay": 150,
+        "post_delay": 200,
         "timeout": 2000
     },
     "Fight_ClickLightMagicPage": {
@@ -349,7 +343,7 @@
             87,
             80
         ],
-        "post_delay": 150,
+        "post_delay": 200,
         "timeout": 2000
     },
     "Fight_ClickDarkMagicPage": {
@@ -370,7 +364,7 @@
             95,
             77
         ],
-        "post_delay": 150,
+        "post_delay": 200,
         "timeout": 2000
     },
     "Fight_Magic_Cast": {
@@ -402,11 +396,9 @@
     "Fight_Magic_Elemental": {
         "next": [
             "Fight_ClickLightMagicPage",
-            "Fight_FindDragon"
-        ],
-        "interrupt": [
-            "Fight_SkillPack_Type",
-            "Fight_SkillPack_Open"
+            "Fight_FindDragon",
+            "[JumpBack]Fight_SkillPack_Type",
+            "[JumpBack]Fight_SkillPack_Open"
         ],
         "post_delay": 100,
         "timeout": 2000
@@ -431,10 +423,8 @@
         "next": [
             "Fight_ClickSpecialMagicPage",
             "Fight_FindDragon",
-            "Fight_FindRespawn"
-        ],
-        "interrupt": [
-            "Fight_SkillPack_Open"
+            "Fight_FindRespawn",
+            "[JumpBack]Fight_SkillPack_Open"
         ],
         "post_delay": 100,
         "timeout": 2000
@@ -561,7 +551,9 @@
         ],
         "action": "DoNothing",
         "post_delay": 500,
-        "next": "Fight_Perfect",
+        "next": [
+            "Fight_Perfect"
+        ],
         "timeout": 2000
     },
     "Fight_Victory": {
@@ -698,7 +690,9 @@
         "connected": true,
         "order_by": "Score",
         "duration": 5000,
-        "next": "Fight_PickUpAll_OpenedDoor"
+        "next": [
+            "Fight_PickUpAll_OpenedDoor"
+        ]
     },
     "Fight_PickUpAll_OpenedDoor": {
         "recognition": "TemplateMatch",
@@ -717,7 +711,9 @@
         "threshold": 0.7,
         "order_by": "Score",
         "timeout": 3000,
-        "next": "Fight_PickUpAll"
+        "next": [
+            "Fight_PickUpAll"
+        ]
     },
     "Fight_FindRespawn": {
         "recognition": "TemplateMatch",
@@ -768,7 +764,9 @@
         "post_delay": 1000,
         "threshold": 0.8,
         "timeout": 3000,
-        "next": "Fight_FindEndGameText"
+        "next": [
+            "Fight_FindEndGameText"
+        ]
     },
     "Fight_FindEndGameText": {
         "recognition": "OCR",
@@ -783,5 +781,8 @@
         "post_delay": 1000,
         "threshold": 0.8,
         "timeout": 3000
+    },
+    "Fight_ManualLeave": {
+        "enabled": false
     }
 }

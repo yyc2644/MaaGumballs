@@ -11,10 +11,8 @@
         "action": "Click",
         "post_delay": 1000,
         "next": [
-            "Kairo_Confirm_OnHome"
-        ],
-        "interrupt": [
-            "Kairo_Internal_Click"
+            "Kairo_Confirm_OnHome",
+            "[JumpBack]Kairo_Internal_Click"
         ]
     },
     "Kairo_Internal_Click": {
@@ -43,12 +41,10 @@
         "action": "Click",
         "post_delay": 2000,
         "next": [
-            "Kairo_Confirm_Onbigmap"
-        ],
-        "interrupt": [
-            "Kairo_GumballHaveRest",
-            "Kairo_Save_Status",
-            "Kairo_Fight_OpenedDoor"
+            "Kairo_Confirm_Onbigmap",
+            "[JumpBack]Kairo_GumballHaveRest",
+            "[JumpBack]Kairo_Save_Status",
+            "[JumpBack]Kairo_Fight_OpenedDoor"
         ]
     },
     "Kairo_GumballHaveRest": {
@@ -57,10 +53,8 @@
             "阵亡"
         ],
         "next": [
-            "Kairo_Relive"
-        ],
-        "interrupt": [
-            "BackText_500ms"
+            "Kairo_Relive",
+            "[JumpBack]BackText_500ms"
         ]
     },
     "Kairo_Relive": {
@@ -113,11 +107,9 @@
             0
         ],
         "next": [
-            "Kairo_Return_Hotel"
-        ],
-        "interrupt": [
-            "ConfirmButton",
-            "BackText_500ms"
+            "Kairo_Return_Hotel",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]BackText_500ms"
         ]
     },
     "Kairo_Save_Status": {
@@ -144,10 +136,8 @@
         "action": "Click",
         "post_delay": 1000,
         "next": [
-            "Kairo_Click_Bell"
-        ],
-        "interrupt": [
-            "Kairo_Internal_Click"
+            "Kairo_Click_Bell",
+            "[JumpBack]Kairo_Internal_Click"
         ]
     },
     "Kairo_Enter_Cave2": {
@@ -162,10 +152,8 @@
         "action": "Click",
         "post_delay": 1000,
         "next": [
-            "Kairo_Click_Bell"
-        ],
-        "interrupt": [
-            "Kairo_Internal_Click"
+            "Kairo_Click_Bell",
+            "[JumpBack]Kairo_Internal_Click"
         ]
     },
     "Kairo_Enter_Cave3": {
@@ -180,10 +168,8 @@
         "action": "Click",
         "post_delay": 1000,
         "next": [
-            "Kairo_Click_Bell"
-        ],
-        "interrupt": [
-            "Kairo_Internal_Click"
+            "Kairo_Click_Bell",
+            "[JumpBack]Kairo_Internal_Click"
         ]
     },
     "Kairo_Enter_Cave7": {
@@ -198,10 +184,8 @@
         "action": "Click",
         "post_delay": 2000,
         "next": [
-            "Kairo_Confirm_Boss"
-        ],
-        "interrupt": [
-            "Kairo_Internal_Click"
+            "Kairo_Confirm_Boss",
+            "[JumpBack]Kairo_Internal_Click"
         ]
     },
     "Kairo_Click_Bell": {
@@ -254,13 +238,11 @@
         "action": "Click",
         "next": [
             "Kairo_Confirm_Onbigmap",
-            "Kairo_Confirm_OutsideMap"
-        ],
-        "interrupt": [
-            "Fight_DownStaris_Loading",
-            "ConfirmButton",
-            "Kairo_Fight_OpenedDoor",
-            "BackText_500ms"
+            "Kairo_Confirm_OutsideMap",
+            "[JumpBack]Fight_DownStaris_Loading",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]Kairo_Fight_OpenedDoor",
+            "[JumpBack]BackText_500ms"
         ],
         "post_delay": 500,
         "timeout": 3000
@@ -276,8 +258,7 @@
         ],
         "action": "Click",
         "post_delay": 1000,
-        "next": [],
-        "interrupt": []
+        "next": []
     },
     "Kairo_SearchingMale": {
         "recognition": "TemplateMatch",
@@ -292,8 +273,7 @@
         "post_delay": 1000,
         "next": [
             "Kairo_PurchaseMembers"
-        ],
-        "interrupt": []
+        ]
     },
     "Kairo_PurchaseMembers": {
         "recognition": "OCR",
@@ -307,10 +287,8 @@
         "action": "Click",
         "post_delay": 3000,
         "next": [
-            "Kairo_Confirm_OnPub"
-        ],
-        "interrupt": [
-            "ClickCenter"
+            "Kairo_Confirm_OnPub",
+            "[JumpBack]ClickCenter"
         ]
     },
     "Kairo_Enter_WeaponStore": {
@@ -324,8 +302,7 @@
         ],
         "action": "Click",
         "post_delay": 1000,
-        "next": [],
-        "interrupt": []
+        "next": []
     },
     "Kairo_Enter_ArmorStore": {
         "recognition": "TemplateMatch",
@@ -338,8 +315,7 @@
         ],
         "action": "Click",
         "post_delay": 1000,
-        "next": [],
-        "interrupt": []
+        "next": []
     },
     "Kairo_Enter_WarriorPromotionStore": {
         "recognition": "TemplateMatch",
@@ -352,8 +328,7 @@
         ],
         "action": "Click",
         "post_delay": 1000,
-        "next": [],
-        "interrupt": []
+        "next": []
     },
     "Kairo_Enter_SupportPromotionStore": {
         "recognition": "TemplateMatch",
@@ -366,8 +341,7 @@
         ],
         "action": "Click",
         "post_delay": 1000,
-        "next": [],
-        "interrupt": []
+        "next": []
     },
     "Kairo_Enter_MonkPromotionStore": {
         "recognition": "TemplateMatch",
@@ -380,8 +354,7 @@
         ],
         "action": "Click",
         "post_delay": 1000,
-        "next": [],
-        "interrupt": []
+        "next": []
     },
     "Kairo_Choose_WarriorMedal": {
         "recognition": "TemplateMatch",
@@ -396,8 +369,7 @@
         "post_delay": 1000,
         "next": [
             "Kairo_PurchaseItem"
-        ],
-        "interrupt": []
+        ]
     },
     "Kairo_Choose_SupportMedal": {
         "recognition": "TemplateMatch",
@@ -412,8 +384,7 @@
         "post_delay": 1000,
         "next": [
             "Kairo_PurchaseItem"
-        ],
-        "interrupt": []
+        ]
     },
     "Kairo_Choose_MonkMedal": {
         "recognition": "TemplateMatch",
@@ -428,8 +399,7 @@
         "post_delay": 1000,
         "next": [
             "Kairo_PurchaseItem"
-        ],
-        "interrupt": []
+        ]
     },
     "Kairo_Choose_MonkMedal_4": {
         "recognition": "TemplateMatch",
@@ -444,8 +414,7 @@
         "post_delay": 1000,
         "next": [
             "Kairo_PurchaseItem"
-        ],
-        "interrupt": []
+        ]
     },
     "Kairo_Choose_Axe": {
         "recognition": "TemplateMatch",
@@ -462,8 +431,7 @@
         "next": [
             "Kairo_PurchaseItem",
             "Kairo_EquipItem"
-        ],
-        "interrupt": []
+        ]
     },
     "Kairo_Choose_HolyMace": {
         "recognition": "TemplateMatch",
@@ -480,8 +448,7 @@
         "next": [
             "Kairo_PurchaseItem",
             "Kairo_EquipItem"
-        ],
-        "interrupt": []
+        ]
     },
     "Kairo_Choose_Armor": {
         "recognition": "TemplateMatch",
@@ -498,8 +465,7 @@
         "next": [
             "Kairo_PurchaseItem",
             "Kairo_EquipItem"
-        ],
-        "interrupt": []
+        ]
     },
     "Kairo_PurchaseItem": {
         "recognition": "OCR",
@@ -512,8 +478,7 @@
         ],
         "action": "Click",
         "post_delay": 1000,
-        "next": [],
-        "interrupt": []
+        "next": []
     },
     "Kairo_ViewTeams": {
         "recognition": "TemplateMatch",
@@ -528,8 +493,7 @@
         "post_delay": 1000,
         "next": [
             "Kairo_ClickCharacter1"
-        ],
-        "interrupt": []
+        ]
     },
     "Kairo_ClickCharacter1": {
         "recognition": "TemplateMatch",
@@ -543,8 +507,7 @@
         "action": "Click",
         "threshold": 0.3,
         "post_delay": 1000,
-        "next": [],
-        "interrupt": []
+        "next": []
     },
     "Kairo_ClickEquipmentBar1": {
         "recognition": "OCR",
@@ -566,10 +529,8 @@
         ],
         "post_delay": 1000,
         "next": [
-            "Kairo_Confirm_OnBag"
-        ],
-        "interrupt": [
-            "ChangeEquipment"
+            "Kairo_Confirm_OnBag",
+            "[JumpBack]ChangeEquipment"
         ]
     },
     "Kairo_ClickEquipmentBar2": {
@@ -592,10 +553,8 @@
         ],
         "post_delay": 1000,
         "next": [
-            "Kairo_Confirm_OnBag"
-        ],
-        "interrupt": [
-            "ChangeEquipment"
+            "Kairo_Confirm_OnBag",
+            "[JumpBack]ChangeEquipment"
         ]
     },
     "Kairo_ClickChangeCharacter": {
@@ -617,8 +576,7 @@
             18
         ],
         "post_delay": 1000,
-        "next": [],
-        "interrupt": []
+        "next": []
     },
     "Kairo_ClickPromotionInterface": {
         "recognition": "OCR",
@@ -639,8 +597,7 @@
             58
         ],
         "post_delay": 1000,
-        "next": [],
-        "interrupt": []
+        "next": []
     },
     "Kairo_Confirm_Onbigmap": {
         "recognition": "TemplateMatch",
@@ -701,8 +658,7 @@
             64
         ],
         "post_delay": 300,
-        "next": [],
-        "interrupt": []
+        "next": []
     },
     "Kairo_Confirm_Boss": {
         "recognition": "TemplateMatch",
@@ -877,10 +833,8 @@
         "action": "Click",
         "post_delay": 500,
         "next": [
-            "Kairo_Confirm_OnRoleInterface"
-        ],
-        "interrupt": [
-            "ClickCenter"
+            "Kairo_Confirm_OnRoleInterface",
+            "[JumpBack]ClickCenter"
         ]
     }
 }

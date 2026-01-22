@@ -41,7 +41,7 @@ class DailyTask(CustomAction):
             context.run_action("HallSwipeToUp")
             for i in range(3):
                 image = context.tasker.controller.post_screencap().wait().get()
-                if context.run_recognition(key, image):
+                if context.run_recognition(key, image).hit:
                     logger.info(f"第{i+1}轮检测到任务图标: {key}")
                     context.run_task(key)
                     IsCheck = True
@@ -89,6 +89,8 @@ class WeeklyRaidFighting(CustomAction):
                 "WeeklyRaid_MonsterCheck",
                 context.tasker.controller.post_screencap().wait().get(),
             ):
+                if not MonsterReco.hit:
+                    break
                 for item in MonsterReco.all_results:
                     # 2.1 点开怪物
                     box = item.box

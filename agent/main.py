@@ -255,7 +255,6 @@ def install_requirements(req_file="requirements.txt", pip_config=None) -> bool:
             "-r",
             str(req_path),
             "--no-warn-script-location",
-            "--break-system-packages",
             "--find-links",
             str(deps_dir),  # pip会优先使用这里的文件
             "--no-index",  # 禁止在线索引
@@ -281,7 +280,6 @@ def install_requirements(req_file="requirements.txt", pip_config=None) -> bool:
             "-r",
             str(req_path),
             "--no-warn-script-location",
-            "--break-system-packages",
             "-i",
             primary_mirror,
         ]
@@ -309,7 +307,6 @@ def install_requirements(req_file="requirements.txt", pip_config=None) -> bool:
             "-r",
             str(req_path),
             "--no-warn-script-location",
-            "--break-system-packages",
         ]
 
         if _run_pip_command(cmd, f"从 {req_path.name} 安装依赖 (本地全局配置)"):

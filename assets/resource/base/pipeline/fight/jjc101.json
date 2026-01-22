@@ -2,11 +2,9 @@
     "JJC": {
         "next": [
             "JJC_Start",
-            "JJC_Fighting"
-        ],
-        "interrupt": [
-            "AlchemyReward",
-            "MapSwipeDownToUp"
+            "JJC_Fighting",
+            "[JumpBack]AlchemyReward",
+            "[JumpBack]MapSwipeDownToUp"
         ]
     },
     "JJC_Start": {
@@ -23,13 +21,11 @@
         "post_delay": 1000,
         "timeout": 1500,
         "next": [
-            "JJC_Select"
-        ],
-        "interrupt": [
-            "PowerLack",
-            "Select_MainWindow",
-            "ConfirmButton",
-            "ClickCenterBelow_500ms"
+            "JJC_Select",
+            "[JumpBack]PowerLack",
+            "[JumpBack]Select_MainWindow",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]ClickCenterBelow_500ms"
         ]
     },
     "JJC_Select": {
@@ -60,10 +56,8 @@
         ],
         "action": "Click",
         "next": [
-            "JJC_Fighting"
-        ],
-        "interrupt": [
-            "GameLoading"
+            "JJC_Fighting",
+            "[JumpBack]GameLoading"
         ]
     },
     "JJC_Fighting": {
@@ -91,11 +85,10 @@
         "custom_action": "Fight_ClearCurrentLayer_time_stop",
         "post_delay": 300,
         "timeout": 1000,
-        "next": [],
-        "interrupt": [
-            "Fight_OpenRewardBox",
-            "BackText",
-            "Fight_CheckOpenedDoor"
+        "next": [
+            "[JumpBack]Fight_OpenRewardBox",
+            "[JumpBack]BackText",
+            "[JumpBack]Fight_CheckOpenedDoor"
         ]
     },
     "JJC_StoneChest": {

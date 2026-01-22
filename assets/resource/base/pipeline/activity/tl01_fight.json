@@ -12,14 +12,12 @@
         "post_delay": 1000,
         "timeout": 1500,
         "next": [
-            "TL01_EntryMaze"
-        ],
-        "interrupt": [
-            "TL01_SelectEasy_Interrupt",
-            "TL01_SelectEasy",
-            "TL01_BuyPower",
-            "ConfirmButton",
-            "ClickCenter"
+            "TL01_EntryMaze",
+            "[JumpBack]TL01_SelectEasy_Interrupt",
+            "[JumpBack]TL01_SelectEasy",
+            "[JumpBack]TL01_BuyPower",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]ClickCenter"
         ]
     },
     "TL01_SelectEasy": {
@@ -190,12 +188,10 @@
         "post_delay": 300,
         "timeout": 1000,
         "next": [
-            "Fight_OpenedDoor"
-        ],
-        "interrupt": [
-            "Fight_OpenRewardBox",
-            "BackText",
-            "Fight_CheckOpenedDoor"
+            "Fight_OpenedDoor",
+            "[JumpBack]Fight_OpenRewardBox",
+            "[JumpBack]BackText",
+            "[JumpBack]Fight_CheckOpenedDoor"
         ]
     },
     "TL01_Start_Count": {

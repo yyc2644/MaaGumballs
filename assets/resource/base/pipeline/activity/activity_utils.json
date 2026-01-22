@@ -3,11 +3,9 @@
         "post_delay": 1000,
         "next": [
             "Activity_Entry",
-            "Activity_Fighting"
-        ],
-        "interrupt": [
-            "AlchemyReward",
-            "MapSwipeUpToDown"
+            "Activity_Fighting",
+            "[JumpBack]AlchemyReward",
+            "[JumpBack]MapSwipeUpToDown"
         ]
     },
     "Activity_Entry": {
@@ -21,14 +19,12 @@
         ],
         "action": "Click",
         "next": [
-            "Activity_EntryMaze"
-        ],
-        "interrupt": [
-            "PowerLack",
-            "Activity_Select_Hard",
-            "Activity_Select",
-            "ConfirmButton",
-            "ClickCenterBelow_500ms"
+            "Activity_EntryMaze",
+            "[JumpBack]PowerLack",
+            "[JumpBack]Activity_Select_Hard",
+            "[JumpBack]Activity_Select",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]ClickCenterBelow_500ms"
         ],
         "post_delay": 1000,
         "timeout": 2000
@@ -73,10 +69,8 @@
         "timeout": 10000,
         "next": [
             "Activity_EntryMazeUpdate",
-            "Activity_Fighting"
-        ],
-        "interrupt": [
-            "GameLoading"
+            "Activity_Fighting",
+            "[JumpBack]GameLoading"
         ]
     },
     "Activity_EntryMazeUpdate": {

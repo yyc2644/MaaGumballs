@@ -3,13 +3,13 @@
         "action": "StopApp",
         "package": "com.v2ray.ang",
         "post_delay": 2000,
-        "next": "StartGumballs"
+        "next": ["StartGumballs"]
     },
     "StartAppV2": {
         "action": "StartApp",
         "package": "com.v2ray.ang",
         "post_delay": 1000,
-        "next": "DisconnectInternet"
+        "next": ["DisconnectInternet"]
     },
     "DisconnectInternet": {
         "recognition": "TemplateMatch",
@@ -25,7 +25,7 @@
         "action": "Click",
         "post_delay": 1000,
         "doc": "这里要快",
-        "next": "StartGumballs"
+        "next": ["StartGumballs"]
     },
     "Save_Status": {
         "recognition": "TemplateMatch",
@@ -41,7 +41,7 @@
             91
         ],
         "post_delay": 1000,
-        "next": "Save_Status_Text"
+        "next": ["Save_Status_Text"]
     },
     "Save_Status_Text": {
         "recognition": "TemplateMatch",
@@ -60,10 +60,8 @@
         "timeout": 3000,
         "next": [
             "Inter_ConfirmButton",
-            "ReturnMazeButton"
-        ],
-        "interrupt": [
-            "GameLoading"
+            "ReturnMazeButton",
+            "[JumpBack]GameLoading"
         ]
     },
     "Inter_ConfirmButton": {
@@ -81,7 +79,7 @@
         ],
         "post_delay": 1000,
         "action": "Click",
-        "next": "ReturnMazeButton"
+        "next": ["ReturnMazeButton"]
     },
     "ReturnMazeButton": {
         "recognition": "TemplateMatch",
@@ -99,10 +97,8 @@
         "post_delay": 4000,
         "next": [
             "ConfirmEquipmentPack",
-            "Inter_ConfirmButton"
-        ],
-        "interrupt": [
-            "GameLoading"
+            "Inter_ConfirmButton",
+            "[JumpBack]GameLoading"
         ]
     },
     "ConfirmEquipmentPack": {
@@ -129,10 +125,8 @@
             121
         ],
         "next": [
-            "LogoutGame_ClickSwitch"
-        ],
-        "interrupt": [
-            "LogoutGame_Swipe"
+            "LogoutGame_ClickSwitch",
+            "[JumpBack]LogoutGame_Swipe"
         ]
     },
     "LogoutGame_Swipe": {
@@ -181,14 +175,12 @@
     },
     "ReturnMaze": {
         "next": [
-            "ReturnMazeButton"
-        ],
-        "interrupt": [
-            "AlchemyReward",
-            "StickyNote_Check",
-            "ServerSwitching",
-            "GameLoading",
-            "LogoutGame"
+            "ReturnMazeButton",
+            "[JumpBack]AlchemyReward",
+            "[JumpBack]StickyNote_Check",
+            "[JumpBack]ServerSwitching",
+            "[JumpBack]GameLoading",
+            "[JumpBack]LogoutGame"
         ],
         "timeout": 20000
     },

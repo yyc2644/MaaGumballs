@@ -37,7 +37,7 @@ class UnionReward(CustomAction):
             try:
                 # Click Roi区域中间
                 x_center, y_center = roi[0] + roi[2] // 2, roi[1] + roi[3] // 2
-                context.tasker.controller.post_click(x_center, y_center)
+                context.tasker.controller.post_click(x_center, y_center).wait()
                 context.run_task("ObtainUnionReward")
 
             except Exception as e:
@@ -56,7 +56,7 @@ class UnionReward_Execute(CustomAction):
         context.run_task("EntryUnionReward")
 
         img = context.tasker.controller.post_screencap().wait().get()
-        if not context.run_recognition("CheckUnionWindows", img):
+        if not context.run_recognition("CheckUnionWindows", img).hit:
             context.run_task("BackText")
 
         context.run_task("EntryUnionTask")

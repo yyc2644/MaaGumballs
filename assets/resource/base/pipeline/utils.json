@@ -136,13 +136,11 @@
     "ReturnHall": {
         "recognition": "DirectHit",
         "next": [
-            "CheckHall"
-        ],
-        "interrupt": [
-            "FlipPage",
-            "ConfirmButton",
-            "BackText",
-            "ClickCenter"
+            "CheckHall",
+            "[JumpBack]FlipPage",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]BackText",
+            "[JumpBack]ClickCenter"
         ]
     },
     "CheckHall": {
@@ -158,13 +156,11 @@
     "ReturnBigMap": {
         "recognition": "DirectHit",
         "next": [
-            "CheckBigMap"
-        ],
-        "interrupt": [
-            "Communicating",
-            "ConfirmButton",
-            "FlipPage",
-            "BackText"
+            "CheckBigMap",
+            "[JumpBack]Communicating",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]FlipPage",
+            "[JumpBack]BackText"
         ]
     },
     "CheckBigMap": {
@@ -269,10 +265,8 @@
         "template": "fight/UniversalUI/Erathia_Entry.png",
         "action": "DoNothing",
         "next": [
-            "MapMoveToBottom"
-        ],
-        "interrupt": [
-            "MapSwipeUpToDown"
+            "MapMoveToBottom",
+            "[JumpBack]MapSwipeUpToDown"
         ],
         "timeout": 2000
     },
@@ -292,6 +286,6 @@
     },
     "CountTask_RunNode": {
         "doc": "这是count的辅助节点，搭配count action使用",
-        "next": "Activity_Start"
+        "next": ["Activity_Start"]
     }
 }

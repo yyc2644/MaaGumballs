@@ -5,6 +5,7 @@ import re
 import os
 import logging
 import psutil
+import base64
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -12,7 +13,6 @@ logging.basicConfig(level=logging.INFO)
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.padding import PKCS7
 from cryptography.hazmat.backends import default_backend
-import base64
 
 
 def get_os_description() -> str:
@@ -39,6 +39,21 @@ def get_os_description() -> str:
         return f"{platform.system()} {platform.release()} {kernel_detail}"
     else:
         return system
+
+
+def get_stable_os_description(original_os_description) -> str:
+    # 对应C#中的正则表达式
+    pattern = r"^(.*?Windows\s+(?:10|11|10\.0|11\.0))(?:\.\d+|.*)$"
+
+    # 使用re.IGNORECASE标志对应RegexOptions.IgnoreCase
+    match = re.match(pattern, original_os_description, re.IGNORECASE)
+
+    if match:
+        # 对应match.Groups[1].Value.Trim()
+        return match.group(1).strip()
+
+    # 如果没有匹配，返回原始描述或空字符串（根据你的需求确定）
+    return original_os_description  # 或者 return ""
 
 
 def get_os_architecture() -> str:
@@ -160,6 +175,17 @@ def get_machine_name() -> str:
 
 def generate():
     os_description = get_os_description()
+    os_stable_description = get_stable_os_description(os_description)
+    os_architecture = get_os_architecture()
+    plain_text_specific_id = get_platform_specific_id()
+    machine_name = get_machine_name()
+
+    combined_string = f"{os_stable_description}_{os_architecture}_{plain_text_specific_id}_{machine_name}"
+    return sha256(combined_string).upper()
+
+
+def generateLegacy():
+    os_description = get_os_description()
     os_architecture = get_os_architecture()
     plain_text_specific_id = get_platform_specific_id()
     machine_name = get_machine_name()
@@ -233,22 +259,53 @@ def get_platform_specific_id():
     return ""
 
 
-def get_device_key():
-    fingerprint = generate()
+def get_device_key(fingerprint: str):
+    # fingerprint = generate()
     return fingerprint[:32]
 
 
 def encrypt(plain_text):
     if not plain_text:
         return ""
-    key = get_device_key()
-    return aes_encrypt(plain_text, key)
+    try:
+        if platform.system() == "Windows":
+            from .CrossPlatformProtectedData import encrypt_data_protectedData
+
+            return encrypt_data_protectedData(plain_text.encode("utf-8"))
+        else:
+            pass
+    except Exception as e:
+        logging.warning(f"跨平台数据加密失败: {str(e)}")
+        try:
+            key = get_device_key(generate())
+            return aes_encrypt(plain_text, key)
+        except Exception as e:
+            logging.warning(e)
+            return ""
 
 
 def decrypt(encrypted_base64):
     try:
-        key = get_device_key()
+        if platform.system() == "Windows":
+            from .CrossPlatformProtectedData import decrypt_data_protectedData
+
+            decrypted_data = decrypt_data_protectedData(encrypted_base64)
+            result = decrypted_data.decode("utf-8")
+            return result
+        else:
+            # linux跟macos 暂时未解决
+            pass
+    except Exception as e:
+        logging.warning(f"跨平台数据解密失败: {str(e)}")
+
+    try:
+        key = get_device_key(generate())
         return aes_decrypt(encrypted_base64, key)
     except Exception as e:
-        logging.warning(e)
-        return ""
+        logging.info(f"使用新设备ID解密失败: {str(e)}")
+        try:
+            key = get_device_key(generateLegacy())
+            return aes_decrypt(encrypted_base64, key)
+        except Exception as e:
+            logging.warning(e)
+            return ""

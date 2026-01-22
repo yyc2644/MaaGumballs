@@ -106,7 +106,7 @@ class GetKeyFromHole_Test(CustomAction):
             # 移动按钮
             context.tasker.controller.post_swipe(
                 button_x, button_y, button_x + step, button_y, 100
-            )
+            ).wait()
             now_leftstring = (
                 context.run_task("FindLeftString").nodes[0].recognition.box.x
             )
@@ -118,7 +118,7 @@ class GetKeyFromHole_Test(CustomAction):
         time.sleep(3)
 
         img = context.tasker.controller.post_screencap().wait().get()
-        if context.run_recognition("Fight_ClosedDoor", img):
+        if context.run_recognition("Fight_ClosedDoor", img).hit:
             return CustomAction.RunResult(success=False)
         else:
             return CustomAction.RunResult(success=True)

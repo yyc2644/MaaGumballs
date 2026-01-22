@@ -2,12 +2,10 @@
     "TitlePanel_Learnable": {
         "next": [
             "TitlePanel_CurrentPanel",
-            "TitlePanel_TitleLearn"
-        ],
-        "interrupt": [
-            "ConfirmButton_500ms",
-            "TitlePanel_Open",
-            "BackText_700ms"
+            "TitlePanel_TitleLearn",
+            "[JumpBack]ConfirmButton_500ms",
+            "[JumpBack]TitlePanel_Open",
+            "[JumpBack]BackText_700ms"
         ],
         "post_delay": 500
     },
@@ -23,20 +21,18 @@
         "action": "Click",
         "target": true,
         "target_offset": [
-            325,
-            75,
+            285,
             0,
-            0
+            10,
+            10
         ],
         "threshold": 0.8,
         "post_delay": 1200,
         "timeout": 2000,
         "next": [
             "TitlePanel_Series",
-            "TitlePanel_Open"
-        ],
-        "interrupt": [
-            "TitlePanel_Series_ChangePage"
+            "TitlePanel_Open",
+            "[JumpBack]TitlePanel_Series_ChangePage"
         ]
     },
     "TitlePanel_Series": {
@@ -65,15 +61,16 @@
     },
     "TitlePanel_ReturnPanel": {
         "next": [
-            "TitlePanel_Panel"
-        ],
-        "interrupt": [
-            "ConfirmButton_500ms",
-            "BackText_700ms"
+            "TitlePanel_Panel",
+            "[JumpBack]ConfirmButton_500ms",
+            "[JumpBack]BackText_700ms"
         ],
         "timeout": 2000
     },
     "TitlePanel_Panel": {
+        "next": [
+            "[JumpBack]ConfirmButton_500ms"
+        ],
         "recognition": "OCR",
         "expected": "系称号",
         "roi": [
@@ -83,9 +80,6 @@
             81
         ],
         "post_delay": 400,
-        "interrupt": [
-            "ConfirmButton_500ms"
-        ],
         "timeout": 2000
     },
     "TitlePanel_CurrentPanel": {
@@ -98,10 +92,8 @@
             81
         ],
         "next": [
-            "TitlePanel_Learnable_Click"
-        ],
-        "interrupt": [
-            "TitlePanel_ReturnPanel"
+            "TitlePanel_Learnable_Click",
+            "[JumpBack]TitlePanel_ReturnPanel"
         ],
         "pre_delay": 300,
         "post_delay": 500,
@@ -110,10 +102,10 @@
     "TitlePanel_Learnable_Fnish": {
         "recognition": "TemplateMatch",
         "roi": [
-            169,
+            182,
             138,
-            387,
-            127
+            374,
+            144
         ],
         "template": [
             "fight/UniversalUI/new_Star_3.png",
@@ -124,7 +116,7 @@
         "next": [
             "BackText_700ms"
         ],
-        "post_delay": 200,
+        "post_delay": 500,
         "timeout": 2000
     },
     "TitlePanel_Learnable_Check": {
@@ -162,9 +154,22 @@
         ],
         "next": [
             "TitlePanel_Learnable_Check",
-            "TitlePanel_Learnable_Fnish"
+            "TitlePanel_Learnable_Fnish",
+            "[JumpBack]TitlePanel_Learnable_ClickOnce"
         ],
-        "post_delay": 300,
+        "post_delay": 1000,
+        "timeout": 10000
+    },
+    "TitlePanel_Learnable_ClickOnce": {
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            53,
+            843,
+            138,
+            152
+        ],
+        "post_delay": 1000,
         "timeout": 2000
     },
     "TitlePanel_TitleCheck_New": {
@@ -233,6 +238,7 @@
         "expected": [
             "升至",
             "升",
+            "开至",
             "提升"
         ],
         "roi": [

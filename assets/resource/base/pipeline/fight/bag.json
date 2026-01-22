@@ -1,11 +1,9 @@
 {
     "Bag_Open": {
         "next": [
-            "Bag_BagPanel"
-        ],
-        "interrupt": [
-            "Bag_OpenClick",
-            "Fight_ReturnMainWindow"
+            "Bag_BagPanel",
+            "[JumpBack]Bag_OpenClick",
+            "[JumpBack]Fight_ReturnMainWindow"
         ],
         "post_delay": 200,
         "timeout": 2000
@@ -54,7 +52,7 @@
         "post_delay": 100,
         "threshold": 0.8,
         "timeout": 1000,
-        "next": "Bag_ToRightestPage"
+        "next": ["Bag_ToRightestPage"]
     },
     "Bag_ToLeftestPage": {
         "recognition": "TemplateMatch",
@@ -69,7 +67,7 @@
         "post_delay": 100,
         "threshold": 0.8,
         "timeout": 1000,
-        "next": "Bag_ToLeftestPage"
+        "next": ["Bag_ToLeftestPage"]
     },
     "Bag_ToNextPage": {
         "recognition": "TemplateMatch",

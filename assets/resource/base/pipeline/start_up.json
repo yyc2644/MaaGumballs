@@ -1,14 +1,12 @@
 {
     "Start_Up": {
         "next": [
-            "MainWindow_Check"
-        ],
-        "interrupt": [
-            "AlchemyReward",
-            "StickyNote_Check",
-            "GameLoading",
-            "EnterGame",
-            "StartGumballs"
+            "MainWindow_Check",
+            "[JumpBack]AlchemyReward",
+            "[JumpBack]StickyNote_Check",
+            "[JumpBack]GameLoading",
+            "[JumpBack]EnterGame",
+            "[JumpBack]StartGumballs"
         ]
     },
     "AlchemyReward": {

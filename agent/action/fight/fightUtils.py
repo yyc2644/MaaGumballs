@@ -87,7 +87,13 @@ def cast_magic(Type: str, MagicName: str, context: Context, TargetPos: tuple = (
         "Fight_Magic_Elemental",
         pipeline_override={
             "Fight_Magic_Elemental": {
-                "next": [MagicType[Type], "Fight_FindDragon", "Fight_FindRespawn"],
+                "next": [
+                    MagicType[Type],
+                    "Fight_FindDragon",
+                    "Fight_FindRespawn",
+                    "[JumpBack]Fight_SkillPack_Type",
+                    "[JumpBack]Fight_SkillPack_Open",
+                ],
                 "pre_delay": 100,
             }
         },
@@ -98,7 +104,7 @@ def cast_magic(Type: str, MagicName: str, context: Context, TargetPos: tuple = (
         "Fight_Magic_Cast",
         image,
         pipeline_override={"Fight_Magic_Cast": {"expected": MagicName}},
-    ):
+    ).hit:
         # 自身释放的魔法
         if TargetPos == (0, 0):
             context.run_task(
@@ -151,7 +157,13 @@ def check_magic(Type: str, MagicName: str, context: Context):
         "Fight_Magic_Elemental",
         pipeline_override={
             "Fight_Magic_Elemental": {
-                "next": [MagicType[Type], "Fight_FindDragon", "Fight_FindRespawn"]
+                "next": [
+                    MagicType[Type],
+                    "Fight_FindDragon",
+                    "Fight_FindRespawn",
+                    "[JumpBack]Fight_SkillPack_Type",
+                    "[JumpBack]Fight_SkillPack_Open",
+                ]
             }
         },
     )
@@ -161,7 +173,7 @@ def check_magic(Type: str, MagicName: str, context: Context):
         "Fight_Magic_Cast",
         image,
         pipeline_override={"Fight_Magic_Cast": {"expected": MagicName}},
-    ):
+    ).hit:
         logger.info(f"找到了魔法:{MagicName}")
         context.run_task("BackText")
     else:
@@ -197,7 +209,7 @@ def cast_magic_special(MagicName: str, context: Context):
             "Fight_Magic_Special_Cast",
             image,
             pipeline_override={"Fight_Magic_Special_Cast": {"expected": MagicName}},
-        ):
+        ).hit:
             context.run_task(
                 "Fight_Magic_Special_Cast",
                 pipeline_override={"Fight_Magic_Special_Cast": {"expected": MagicName}},
@@ -241,7 +253,7 @@ def check_magic_special(MagicName: str, context: Context):
             "Fight_Magic_Special_Cast",
             image,
             pipeline_override={"Fight_Magic_Special_Cast": {"expected": MagicName}},
-        ):
+        ).hit:
             logger.info(f"找到了魔法:{MagicName}")
             context.run_task("BackText")
             return True
@@ -267,11 +279,11 @@ def title_learn(
     # 对应几级称号的坐标
     titileRect: list = [
         [0, 0, 0, 0],
-        [53, 843, 138, 152],
-        [185, 854, 119, 136],
-        [296, 847, 127, 140],
-        [418, 842, 123, 147],
-        [530, 847, 133, 147],
+        [95, 890, 65, 52],
+        [210, 883, 70, 62],
+        [329, 883, 63, 59],
+        [446, 886, 62, 52],
+        [560, 881, 69, 67],
     ]
 
     for i in range(0, expectedLevel):
@@ -290,6 +302,7 @@ def title_learn(
                 "TitlePanel_Series": {"expected": titleType},
                 "TitlePanel_Panel": {"expected": titleType},
                 "TitlePanel_CurrentPanel": {"expected": titleType},
+                "TitlePanel_Learnable_ClickOnce": {"target": titileRect[titleLevel]},
             },
         )
 
@@ -316,11 +329,10 @@ def title_check(titleType: str, context: Context):
                     "timeout": 2000,
                 }
             },
-        ):
+        ).hit:
             isSuccess = True
             context.run_task("Fight_ReturnMainWindow")
             break
-
         else:
             context.tasker.controller.post_click(433, 1037).wait()
             checkcount += 1
@@ -341,11 +353,11 @@ def title_learn_branch(
     # 对应几级称号的坐标
     titileRect: list = [
         [0, 0, 0, 0],
-        [53, 843, 138, 152],
-        [185, 854, 119, 136],
-        [296, 847, 127, 140],
-        [418, 842, 123, 147],
-        [530, 847, 133, 147],
+        [95, 890, 65, 52],
+        [210, 883, 70, 62],
+        [329, 883, 63, 59],
+        [446, 886, 62, 52],
+        [560, 881, 69, 67],
     ]
     if not repeatable:
         titleName_roi = [54, 463, 623, 550]
@@ -369,11 +381,12 @@ def title_learn_branch(
                 "TitlePanel_Series": {"expected": titleType},
                 "TitlePanel_Panel": {"expected": titleType},
                 "TitlePanel_CurrentPanel": {"expected": titleType},
+                "TitlePanel_Learnable_ClickOnce": {"target": titileRect[titleLevel]},
             },
         )
         time.sleep(0.3)
         image = context.tasker.controller.post_screencap().wait().get()
-        if context.run_recognition("ConfirmButton_500ms", image):
+        if context.run_recognition("ConfirmButton_500ms", image).hit:
             context.run_task("ConfirmButton_500ms")
 
     context.run_task("TitlePanel_ReturnPanel")
@@ -403,7 +416,7 @@ def checkEquipment(
     )
 
     # 输出目标装备是否装备上
-    if ItemRecoDetail:
+    if ItemRecoDetail.hit:
         logger.info(f"已装备: {equipmentName}")
     else:
         logger.info(f"未装备: {equipmentName}")
@@ -423,6 +436,8 @@ def findEquipment(
     while BagRecoDetail := context.run_recognition(
         "Bag_ToPrevPage", context.tasker.controller.post_screencap().wait().get()
     ):
+        if not BagRecoDetail.hit:
+            break
         box = BagRecoDetail.best_result.box
         center_x, center_y = box[0] + box[2] // 2, box[1] + box[3] // 2
         context.tasker.controller.post_click(center_x, center_y).wait()
@@ -442,7 +457,7 @@ def findEquipment(
         )
 
         # 输出目标装备是否存在
-        if ItemRecoDetail:
+        if ItemRecoDetail.hit:
             logger.info(f"已找到: {equipmentName}")
             if isEquip:
                 center_x, center_y = (
@@ -453,7 +468,7 @@ def findEquipment(
                 time.sleep(1)
                 context.run_task("Bag_LoadItem")
             break
-        elif context.run_recognition("Bag_ToNextPage", image):
+        elif context.run_recognition("Bag_ToNextPage", image).hit:
             context.run_task("Bag_ToNextPage")
         else:
             logger.info(f"背包未找到: {equipmentName}")
@@ -471,6 +486,8 @@ def disassembleEquipment(
     while BagRecoDetail := context.run_recognition(
         "Bag_ToPrevPage", context.tasker.controller.post_screencap().wait().get()
     ):
+        if not BagRecoDetail.hit:
+            break
         box = BagRecoDetail.best_result.box
         center_x, center_y = box[0] + box[2] // 2, box[1] + box[3] // 2
         context.tasker.controller.post_click(center_x, center_y).wait()
@@ -491,7 +508,7 @@ def disassembleEquipment(
         )
 
         # 输出目标装备是否存在
-        if ItemRecoDetail:
+        if ItemRecoDetail.hit:
             logger.info(f"已找到: {equipmentName}")
             center_x, center_y = (
                 ItemRecoDetail.box[0] + ItemRecoDetail.box[2] // 2,
@@ -502,16 +519,16 @@ def disassembleEquipment(
             context.run_task("Bag_DisassembleItem")
             # 点击分解按钮之后有两种情况，如果只有一件装备那么只需要点击确定，如果超过一件装备那么需要点击分解x次
             image = context.tasker.controller.post_screencap().wait().get()
-            if context.run_recognition("ConfirmButton_500ms", image):
+            if context.run_recognition("ConfirmButton_500ms", image).hit:
                 context.run_task("ConfirmButton_500ms")
-            elif context.run_recognition("Bag_DisassembleAllItem", image):
+            elif context.run_recognition("Bag_DisassembleAllItem", image).hit:
                 context.run_task("Bag_DisassembleAllItem")
             time.sleep(1)
             context.run_task("ConfirmButton_500ms")
 
             logger.info(f"{equipmentName}已分解")
             time.sleep(1)
-        elif context.run_recognition("Bag_ToNextPage", image):
+        elif context.run_recognition("Bag_ToNextPage", image).hit:
             context.run_task("Bag_ToNextPage")
         else:
             logger.info(f"背包未找到: {equipmentName}")
@@ -535,6 +552,8 @@ def findItem(
     while BagRecoDetail := context.run_recognition(
         "Bag_ToPrevPage", context.tasker.controller.post_screencap().wait().get()
     ):
+        if not BagRecoDetail.hit:
+            break
         box = BagRecoDetail.best_result.box
         center_x, center_y = box[0] + box[2] // 2, box[1] + box[3] // 2
         context.tasker.controller.post_click(center_x, center_y).wait()
@@ -556,7 +575,7 @@ def findItem(
         )
 
         # 输出目标装备是否存在
-        if ItemRecoDetail:
+        if ItemRecoDetail.hit:
             logger.info(f"已找到: {equipmentName}")
             if isUse:
                 center_x, center_y = (
@@ -567,7 +586,7 @@ def findItem(
                 time.sleep(1)
 
                 image = context.tasker.controller.post_screencap().wait().get()
-                if context.run_recognition("Bag_LoadItem", image):
+                if context.run_recognition("Bag_LoadItem", image).hit:
                     context.run_task("Bag_LoadItem")
                 # 使用所有
                 else:
@@ -577,7 +596,7 @@ def findItem(
                     logger.info(f"使用物品 {equipmentName}, at {dst_x},{dst_y}")
                     context.tasker.controller.post_click(dst_x, dst_y).wait()
             break
-        elif context.run_recognition("Bag_ToNextPage", image):
+        elif context.run_recognition("Bag_ToNextPage", image).hit:
             context.run_task("Bag_ToNextPage")
         else:
             logger.info(f"背包未找到: {equipmentName}")
@@ -590,6 +609,7 @@ def openBagAndUseItem(
     equipmentName: str,
     isUse: bool,
     context: Context,
+    isReturnMainWindow: bool = True,
 ):
     context.run_task("Fight_ReturnMainWindow")
     OpenDetail = context.run_task("Bag_Open")
@@ -597,7 +617,8 @@ def openBagAndUseItem(
         time.sleep(1)
         findItem(equipmentName, isUse, context)
     time.sleep(1)
-    context.run_task("Fight_ReturnMainWindow")
+    if isReturnMainWindow:
+        context.run_task("Fight_ReturnMainWindow")
 
 
 def pair_by_distance(detections, max_distance=200):
@@ -678,7 +699,7 @@ def checkBuffStatus(buffName: str, context: Context):
                 "template": BuffPath,
             }
         },
-    ):
+    ).hit:
         logger.info(f"已发现: {buffName} buff")
         return True
     logger.info(f"未发现: {buffName} buff")
@@ -725,6 +746,11 @@ def checkGumballsStatusV2(context: Context):
         for _ in range(5):
             image = context.tasker.controller.post_screencap().wait().get()
             if reco_detail := context.run_recognition("Fight_CheckStatusText", image):
+                if not reco_detail.hit:
+                    logger.warning("状态识别失败，等待一秒再次识别")
+                    time.sleep(1)
+                    context.run_task("Fight_OpenStatusPanel")
+                    continue
                 try:
                     nodes = reco_detail.all_results
                     new_status = pair_by_distance(nodes, max_distance=200)
@@ -814,7 +840,7 @@ def dragonwish(targetWish: str, context: Context):
     time.sleep(8)
     textdetail = context.run_task("Fight_FindText")
     if textdetail.nodes:
-        for result in textdetail.nodes[0].recognition.filterd_results:
+        for result in textdetail.nodes[0].recognition.filtered_results:
             if result.text.endswith("！") or result.text.endswith("!"):
                 result.text = result.text[:-1]
             cuurent_wish_index = wishlist.index(result.text)
@@ -848,8 +874,8 @@ def dragonwish(targetWish: str, context: Context):
                     },
                 },
             )
-            status = TextRecoDetail
-            if TextRecoDetail:
+            status = TextRecoDetail.hit
+            if TextRecoDetail.hit:
                 center_x, center_y = (
                     TextRecoDetail.box[0] + TextRecoDetail.box[2] // 2,
                     TextRecoDetail.box[1] + TextRecoDetail.box[3] // 2 + 10,
@@ -890,7 +916,7 @@ def dragonwish(targetWish: str, context: Context):
             context.tasker.controller.post_click(646, 939).wait()
             time.sleep(2)
             image = context.tasker.controller.post_screencap().wait().get()
-            if context.run_recognition("ConfirmButton_500ms", image):
+            if context.run_recognition("ConfirmButton_500ms", image).hit:
                 context.run_task("ConfirmButton_500ms")
             # 等待拾取结束
         elif min_index_wish in ["我要更多的伙伴"]:
@@ -902,7 +928,7 @@ def dragonwish(targetWish: str, context: Context):
             context.tasker.controller.post_click(646, 939).wait()
             time.sleep(2)
             image = context.tasker.controller.post_screencap().wait().get()
-            if context.run_recognition("ConfirmButton_500ms", image):
+            if context.run_recognition("ConfirmButton_500ms", image).hit:
                 context.run_task("ConfirmButton_500ms")
             pass
             # todo 清理当前层的逻辑
@@ -923,7 +949,7 @@ def dragonwish(targetWish: str, context: Context):
             context.tasker.controller.post_click(646, 939).wait()
             time.sleep(2)
             image = context.tasker.controller.post_screencap().wait().get()
-            if context.run_recognition("ConfirmButton_500ms", image):
+            if context.run_recognition("ConfirmButton_500ms", image).hit:
                 context.run_task("ConfirmButton_500ms")
             send_message("MaaGB", "冒险者大人，今日钻石已领肥家咯~")
         elif min_index_wish in ["我要大量的矿石"]:
@@ -942,7 +968,7 @@ def dragonwish(targetWish: str, context: Context):
             context.tasker.controller.post_click(646, 939).wait()
             time.sleep(2)
             image = context.tasker.controller.post_screencap().wait().get()
-            if context.run_recognition("ConfirmButton_500ms", image):
+            if context.run_recognition("ConfirmButton_500ms", image).hit:
                 context.run_task("ConfirmButton_500ms")
 
         elif min_index_wish in ["我要变得更强", "我要神奇的果实"]:
@@ -1060,10 +1086,10 @@ def OpenNatureSwitch(isDefense: bool, context: Context):
 
 def autoOpenPicup(context: Context):
     # 测试中
-    context.tasker.controller.post_touch_down(68, 661)
+    context.tasker.controller.post_touch_down(68, 661).wait()
     time.sleep(5)
     context.run_task("Fight_OpenedDoor")
-    context.tasker.controller.post_touch_up()
+    context.tasker.controller.post_touch_up().wait()
 
 
 def Saveyourlife(context: Context):
@@ -1081,7 +1107,7 @@ def Saveyourlife(context: Context):
         )
         checkcount += 1
         time.sleep(1)
-        if TextRecoDetail:
+        if TextRecoDetail.hit:
             break
 
     if TextRecoDetail:
@@ -1097,10 +1123,10 @@ def Saveyourlife(context: Context):
 def handle_dragon_event(map_str: str, context: Context):
     # 检测神龙
     img = context.tasker.controller.post_screencap().wait().get()
-    if not context.run_recognition("Fight_CheckDragonBall", img):
+    if not context.run_recognition("Fight_CheckDragonBall", img).hit:
         return False
 
-    if context.run_recognition("Fight_FindDragon", img):
+    if context.run_recognition("Fight_FindDragon", img).hit:
         logger.info("是神龙,俺,俺们有救了！！！")
         logger.info(f"当前:{map_str}")
         dragonwish(map_str, context)
@@ -1118,6 +1144,8 @@ def handle_currentlayer_event(context: Context):
             context.tasker.controller.post_screencap().wait().get(),
         )
     ):
+        if not RunResult.hit:
+            break
         tempLayers = extract_num_layer(RunResult.best_result.text)
         if context.tasker.stopping:
             logger.info("检测到停止任务, 开始退出agent")
@@ -1128,17 +1156,20 @@ def handle_currentlayer_event(context: Context):
 def handle_downstair_event(context: Context):
     temp_layer = handle_currentlayer_event(context)
     recoDetail = context.run_task("Fight_OpenedDoor")
-    if not recoDetail.nodes and context.run_recognition(
-        "FindKeyHole", context.tasker.controller.post_screencap().wait().get()
+    if (
+        not recoDetail.nodes[0].completed
+        and context.run_recognition(
+            "FindKeyHole", context.tasker.controller.post_screencap().wait().get()
+        ).hit
     ):
         logger.warning("检查到神秘的洞穴捏，请冒险者大人检查！！")
         send_alert("洞穴警告", "发现神秘洞穴，请及时处理！")
-        send_message(f"MaaGB", "发现神秘洞穴，请及时处理")
+        send_message("洞穴警告", "发现神秘洞穴，请及时处理！")
 
         while not context.run_recognition(
             "Fight_OpenedDoor",
             context.tasker.controller.post_screencap().wait().get(),
-        ):
+        ).hit:
             if context.tasker.stopping:
                 logger.info("检测到停止任务, 开始退出agent")
                 return False
@@ -1162,7 +1193,7 @@ def handle_skillShop_event(
     # 打开技能商店
     if context.run_recognition(
         "Fight_SkillShop", context.tasker.controller.post_screencap().wait().get()
-    ):
+    ).hit:
         logger.info("触发技能商店")
 
         context.run_task("Fight_SkillShop")
@@ -1181,14 +1212,17 @@ def handle_skillShop_event(
                 }
             },
         ):
-            logger.info(f"找到商品{len(recoDetail.filterd_results)}个, 开始购物")
-            for result in recoDetail.filterd_results:
+            if not recoDetail.hit:
+                logger.info("没有找到商品")
+                return
+            logger.info(f"找到商品{len(recoDetail.filtered_results)}个, 开始购物")
+            for result in recoDetail.filtered_results:
                 if result.score < 0.8:
                     continue
                 box = result.box
                 context.tasker.controller.post_click(
                     box[0] + box[2] // 2, box[1] + box[3] // 2
-                )
+                ).wait()
                 time.sleep(0.5)
                 context.run_task("ConfirmButton_500ms")
         context.run_task("Fight_ReturnMainWindow")

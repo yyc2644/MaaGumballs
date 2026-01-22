@@ -220,7 +220,7 @@ def send_qmsg(dp: dict, title: str, text: str) -> bool:
                         )
                         return False
                 else:
-                    logger.error(f"消息推送失败，状态码：{ response.get("status") }")
+                    logger.error(f"消息推送失败，状态码：{ response.get('status') }")
                     return False
             else:
                 logger.error("Qmsg URL 无效，请检查配置")
@@ -290,10 +290,10 @@ def send_dingTalk(dp: dict, title: str, text: str) -> bool:
                     logger.debug(f"消息发送耗时: {end - start}s")
                     return True
                 else:
-                    logger.error(f"消息推送失败: { response.get("json")["errmsg"] }")
+                    logger.error(f"消息推送失败: { response.get('json')['errmsg'] }")
                     return False
             else:
-                logger.error(f"消息推送失败，状态码：{ response.get("status") }")
+                logger.error(f"消息推送失败，状态码：{ response.get('status') }")
                 return False
         except Exception as e:
             logger.info(f"消息推送失败: { str(e) }")

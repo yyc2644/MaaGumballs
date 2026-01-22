@@ -1,10 +1,8 @@
 {
     "Select_ReturnEntry": {
         "next": [
-            "Select_MainWindow"
-        ],
-        "interrupt": [
-            "BackText"
+            "Select_MainWindow",
+            "[JumpBack]BackText"
         ]
     },
     "Select_MainWindow": {
@@ -21,12 +19,12 @@
         "timeout": 2000
     },
     "Select_MainCharacter": {
-        "next": "Select_WorldTree",
-        "interrupt": [
-            "Communicating",
-            "ConfirmButton",
-            "FlipPage",
-            "BackText"
+        "next": [
+            "Select_WorldTree",
+            "[JumpBack]Communicating",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]FlipPage",
+            "[JumpBack]BackText"
         ]
     },
     "Select_WorldTree": {
@@ -42,10 +40,8 @@
         "post_delay": 1500,
         "timeout": 3000,
         "next": [
-            "Select_WorldTree_SearchButton"
-        ],
-        "interrupt": [
-            "Select_CharacterIndex"
+            "Select_WorldTree_SearchButton",
+            "[JumpBack]Select_CharacterIndex"
         ]
     },
     "Select_CharacterIndex": {

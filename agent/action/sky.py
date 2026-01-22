@@ -48,7 +48,7 @@ class AutoSky(CustomAction):
         if not context.run_recognition(
             "AutoSky_CheckExplorationInfo",
             context.tasker.controller.post_screencap().wait().get(),
-        ):
+        ).hit:
             logger.error("任务开始后未能识别到探索信息界面,AutoSky 任务终止。")
             return CustomAction.RunResult(success=False)
 
@@ -78,14 +78,19 @@ class AutoSky(CustomAction):
                 "AutoSky_CheckTargetNum",
                 context.tasker.controller.post_screencap().wait().get(),
             ):
-                try:
-                    parsed_num = int(target_num_reco.best_result.text)
-                    max_manual_attempts = parsed_num + 1
-                    logger.info(
-                        f"识别到当前目标数: {parsed_num}，本轮手动探索最多尝试 {max_manual_attempts} 次。"
-                    )
-                except ValueError:
-                    logger.warning("未能解析目标数，本轮手动探索使用默认尝试次数 7。")
+                if target_num_reco.hit:
+                    try:
+                        parsed_num = int(target_num_reco.best_result.text)
+                        max_manual_attempts = parsed_num + 1
+                        logger.info(
+                            f"识别到当前目标数: {parsed_num}，本轮手动探索最多尝试 {max_manual_attempts} 次。"
+                        )
+                    except ValueError:
+                        logger.warning(
+                            "未能解析目标数，本轮手动探索使用默认尝试次数 7。"
+                        )
+                else:
+                    logger.warning("未能识别到目标数，本轮手动探索使用默认尝试次数 7。")
             else:
                 logger.warning("未能识别到目标数，本轮手动探索使用默认尝试次数 7。")
 
@@ -104,7 +109,7 @@ class AutoSky(CustomAction):
                 if context.run_recognition(
                     "AutoSky_RiftDetection",
                     context.tasker.controller.post_screencap().wait().get(),
-                ):
+                ).hit:
                     logger.info(
                         f"当前目标为时空裂痕，继续切换 ({manual_attempts_done}/{max_manual_attempts} 次尝试)。"
                     )
@@ -115,7 +120,7 @@ class AutoSky(CustomAction):
                     current_img = (
                         context.tasker.controller.post_screencap().wait().get()
                     )
-                    if context.run_recognition("AutoSky_Lost", current_img):
+                    if context.run_recognition("AutoSky_Lost", current_img).hit:
                         logger.warning("遇到打不过的敌人，本轮探索结束")
                         time.sleep(2)
                         context.run_task("BackText_500ms")
@@ -124,7 +129,9 @@ class AutoSky(CustomAction):
 
                     # 只有在克隆体启用时才检查克隆体阵亡
                     if self._clone_enabled:
-                        if context.run_recognition("AutoSky_TroopLoss", current_img):
+                        if context.run_recognition(
+                            "AutoSky_TroopLoss", current_img
+                        ).hit:
                             logger.warning("识别到克隆体战损，本轮探索结束。")
                             time.sleep(2)
                             context.run_task("AutoSky_TroopLoss_Backtext")
@@ -155,7 +162,7 @@ class AutoSky(CustomAction):
                     if context.run_recognition(
                         "AutoSky_CheckExplorationInfo",
                         context.tasker.controller.post_screencap().wait().get(),
-                    ):
+                    ).hit:
                         logger.warning("未能成功离开雷达界面，重新尝试。")
                         time.sleep(2)
                         continue  # 继续下一次重试
@@ -188,7 +195,7 @@ class AutoSky(CustomAction):
             if not context.run_recognition(
                 "AutoSky_SkyExplore_Confirm_Finish",
                 context.tasker.controller.post_screencap().wait().get(),
-            ):
+            ).hit:
                 logger.info("未成功消耗能量，可能没能量或者雷达满了，任务结束。")
                 self._current_round = self._target_round
                 break

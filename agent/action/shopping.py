@@ -42,11 +42,11 @@ class Shopping(CustomAction):
             },
         )
         # Click boxCenter
-        if recoDetail:
+        if recoDetail.hit:
             box = recoDetail.best_result.box
             context.tasker.controller.post_click(
                 int(box[0] + box[2] / 2), int(box[1] + box[3] / 2)
-            )
+            ).wait()
         time.sleep(1)
 
         return recoDetail
@@ -77,10 +77,10 @@ class Shopping(CustomAction):
         while SwipeCount > 0:
             img = context.tasker.controller.post_screencap().wait().get()
             recoDetail = context.run_recognition(
-                "Shop_FindGoldCions_reco",
+                "Shop_FindGoldCionReco",
                 img,
                 pipeline_override={
-                    "Shop_FindGoldCions_reco": {
+                    "Shop_FindGoldCionReco": {
                         "recognition": "TemplateMatch",
                         "template": "Shop/GoldCoins.png",
                         "roi": [65, 334, 610, 686],
@@ -89,7 +89,7 @@ class Shopping(CustomAction):
                 },
             )
 
-            if recoDetail:
+            if recoDetail.hit:
                 logger.info(f"找到商品{len(recoDetail.all_results)}个, 开始购物")
                 for result in recoDetail.all_results:
                     if result.score < 0.8:
@@ -100,14 +100,16 @@ class Shopping(CustomAction):
                     ).wait()
                     time.sleep(1)
                     context.run_task("ConfirmButton")
-                    if self.Shop_ShoppingRewards_Check(context):
+                    ShopRecoDetail = self.Shop_ShoppingRewards_Check(context)
+                    if ShopRecoDetail.hit:
                         context.run_task("Shop_ShoppingRewards")
 
             context.run_task("SwipeShopList")
             SwipeCount -= 1
 
         # 返回商店列表
-        if not self.CheckShopListWindows(context):
+        ShopListRecoDetail = self.CheckShopListWindows(context)
+        if not ShopListRecoDetail.hit:
             context.run_task("BackText")
         return True
 
@@ -131,7 +133,7 @@ class Shopping(CustomAction):
                 },
             )
 
-            if recoDetail:
+            if recoDetail.hit:
                 logger.info(f"找到商品{len(recoDetail.all_results)}个, 开始购物")
                 for result in recoDetail.all_results:
                     if result.score < 0.8:
@@ -139,7 +141,7 @@ class Shopping(CustomAction):
                     box = result.box
                     context.tasker.controller.post_click(
                         int(box[0] + box[2] / 2) + 40, int(box[1] + box[3] / 2) - 80
-                    )
+                    ).wait()
                     time.sleep(0.5)
                     context.run_task("ConfirmButton")
 
@@ -161,11 +163,12 @@ class Shopping(CustomAction):
         )
 
         # 符石商店购物
-        if recoDetail:
+        if recoDetail.hit:
             context.run_task("Shop_Runestone")
 
         # 返回商店列表
-        if not self.CheckShopListWindows(context):
+        ShopListRecoDetail = self.CheckShopListWindows(context)
+        if not ShopListRecoDetail.hit:
             context.run_task("BackText")
 
         return True
@@ -187,11 +190,12 @@ class Shopping(CustomAction):
         )
 
         # 佣兵商店购物
-        if recoDetail:
+        if recoDetail.hit:
             context.run_task("Shop_Mercenary")
 
         # 返回商店列表
-        if not self.CheckShopListWindows(context):
+        ShopListRecoDetail = self.CheckShopListWindows(context)
+        if not ShopListRecoDetail.hit:
             context.run_task("BackText")
 
         return True
@@ -215,7 +219,8 @@ class Shopping(CustomAction):
         # 进入商店列表
         context.run_task("ClickSwitchShopButton")
 
-        if self.CheckShopListWindows(context):
+        ShopListRecoDetail = self.CheckShopListWindows(context)
+        if ShopListRecoDetail.hit:
             # 进入商店
             logger.info("进入商店列表成功")
 
@@ -258,14 +263,17 @@ class SkillShop_Shopping(CustomAction):
                 }
             },
         ):
-            logger.info(f"找到商品{len(recoDetail.filterd_results)}个, 开始购物")
-            for result in recoDetail.filterd_results:
+            if not recoDetail.hit:
+                logger.info("未找到商品")
+                return CustomAction.RunResult(success=True)
+            logger.info(f"找到商品{len(recoDetail.filtered_results)}个, 开始购物")
+            for result in recoDetail.filtered_results:
                 if result.score < 0.8:
                     continue
                 box = result.box
                 context.tasker.controller.post_click(
                     box[0] + box[2] // 2, box[1] + box[3] // 2
-                )
+                ).wait()
                 time.sleep(0.5)
                 context.run_task("ConfirmButton_500ms")
         context.run_task("Fight_ReturnMainWindow")
@@ -290,17 +298,18 @@ class Mars_Shopping(CustomAction):
                 }
             },
         ):
-            logger.info(f"找到战利品{len(recoDetail.filterd_results)}个, 开始购物")
-            for result in recoDetail.filterd_results:
-                if result.score < 0.8:
-                    continue
-                box = result.box
-                context.tasker.controller.post_click(
-                    int(box[0] + box[2] / 2) + 65, int(box[1] + box[3] / 2) - 85
-                ).wait()
-                time.sleep(0.3)
+            if recoDetail.hit:
+                logger.info(f"找到战利品{len(recoDetail.filtered_results)}个, 开始购物")
+                for result in recoDetail.filtered_results:
+                    if result.score < 0.8:
+                        continue
+                    box = result.box
+                    context.tasker.controller.post_click(
+                        int(box[0] + box[2] / 2) + 65, int(box[1] + box[3] / 2) - 85
+                    ).wait()
+                    time.sleep(0.3)
 
-                context.run_task("ConfirmButton_500ms")
+                    context.run_task("ConfirmButton_500ms")
         time.sleep(0.3)
         if recoDetail := context.run_recognition(
             "Shop_FindMarsSpecialBox_reco",
@@ -314,16 +323,19 @@ class Mars_Shopping(CustomAction):
                 }
             },
         ):
-            logger.info(f"找到特殊战利品{len(recoDetail.filterd_results)}个, 开始购物")
-            for result in recoDetail.filterd_results:
-                if result.score < 0.8:
-                    continue
-                box = result.box
-                context.tasker.controller.post_click(
-                    box[0] + box[2] // 2, box[1] + box[3] // 2
+            if recoDetail.hit:
+                logger.info(
+                    f"找到特殊战利品{len(recoDetail.filtered_results)}个, 开始购物"
                 )
-                time.sleep(0.3)
-                context.run_task("ConfirmButton_500ms")
+                for result in recoDetail.filtered_results:
+                    if result.score < 0.8:
+                        continue
+                    box = result.box
+                    context.tasker.controller.post_click(
+                        box[0] + box[2] // 2, box[1] + box[3] // 2
+                    ).wait()
+                    time.sleep(0.3)
+                    context.run_task("ConfirmButton_500ms")
 
         context.run_task("Fight_ReturnMainWindow")
         return CustomAction.RunResult(success=True)

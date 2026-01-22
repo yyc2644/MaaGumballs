@@ -5,15 +5,13 @@
         ]
     },
     "ReturnMaze": {
-        "next":[
-            "Fight_MainWindow"
-        ],
-        "interrupt":[
-            "AlchemyReward",
-            "StickyNote_Check",
-            "GameLoading",
-            "EnterGame",
-            "StartGumballs"
+        "next": [
+            "Fight_MainWindow",
+            "[JumpBack]AlchemyReward",
+            "[JumpBack]StickyNote_Check",
+            "[JumpBack]GameLoading",
+            "[JumpBack]EnterGame",
+            "[JumpBack]StartGumballs"
         ]
     },
     "StickyNote_Check": {

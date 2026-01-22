@@ -23,13 +23,11 @@
         "doc": "自动天空特别定制的返回大地图,添加了取消了点击确定按钮",
         "recognition": "DirectHit",
         "next": [
-            "CheckBigMap"
-        ],
-        "interrupt": [
-            "AutoSky_TroopLoss_Backtext",
-            "BackText",
-            "AutoSky_Exit_Radar_Interface",
-            "Communicating"
+            "CheckBigMap",
+            "[JumpBack]AutoSky_TroopLoss_Backtext",
+            "[JumpBack]BackText",
+            "[JumpBack]AutoSky_Exit_Radar_Interface",
+            "[JumpBack]Communicating"
         ]
     },
     "AutoSky_EntryEden": {
@@ -149,10 +147,8 @@
         "timeout": 2000,
         "action": "Click",
         "next": [
-            "AutoSky_Enter_Radar_Interface"
-        ],
-        "interrupt": [
-            "BackText"
+            "AutoSky_Enter_Radar_Interface",
+            "[JumpBack]BackText"
         ]
     },
     "AutoSky_Enter_Radar_Interface": {
@@ -274,10 +270,8 @@
         "timeout": 5000,
         "next": [
             "AutoSky_TroopLoss",
-            "AutoSky_CheckExplorationInfo"
-        ],
-        "interrupt": [
-            "ClickCenter_200ms"
+            "AutoSky_CheckExplorationInfo",
+            "[JumpBack]ClickCenter_200ms"
         ]
     },
     "AutoSky_Lost": {

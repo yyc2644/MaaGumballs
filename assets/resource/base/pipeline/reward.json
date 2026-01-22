@@ -6,12 +6,10 @@
     },
     "UnionReward_Start": {
         "next": [
-            "CheckUnionWindows_Next"
-        ],
-        "interrupt": [
-            "EntryUnion",
-            "ReturnBigMap",
-            "ConfirmButton"
+            "CheckUnionWindows_Next",
+            "[JumpBack]EntryUnion",
+            "[JumpBack]ReturnBigMap",
+            "[JumpBack]ConfirmButton"
         ]
     },
     "CheckUnionWindows_Next": {
@@ -90,11 +88,9 @@
             137
         ],
         "next": [
-            "BackText"
-        ],
-        "interrupt": [
-            "FlipPage",
-            "ConfirmButton"
+            "BackText",
+            "[JumpBack]FlipPage",
+            "[JumpBack]ConfirmButton"
         ]
     },
     "EntryUnionTask": {
@@ -109,7 +105,7 @@
         "post_delay": 1000,
         "timeout": 2000,
         "action": "Click",
-        "next": "OneClickCompleteAllTask"
+        "next": ["OneClickCompleteAllTask"]
     },
     "OneClickCompleteAllTask": {
         "recognition": "OCR",
@@ -123,11 +119,11 @@
         "post_delay": 4000,
         "timeout": 2000,
         "action": "Click",
-        "next": "CheckUnionWindows",
-        "interrupt": [
-            "FlipPage",
-            "ConfirmButton",
-            "BackText"
+        "next": [
+            "CheckUnionWindows",
+            "[JumpBack]FlipPage",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]BackText"
         ]
     },
     "CheckUnionWindows": {
@@ -159,8 +155,7 @@
         "next": [
             "OneClickCompleteAllReward_GiveGifts",
             "OneClickCompleteAllReward_PickUpGifts"
-        ],
-        "interrupt": []
+        ]
     },
     "OneClickCompleteAllReward_PickUpGifts": {
         "recognition": "OCR",
@@ -207,10 +202,8 @@
     "Cdk_Start": {
         "next": [
             "Cdk_Select_CdkEntrance",
-            "Cdk_MainSettingsEntrance"
-        ],
-        "interrupt": [
-            "ReturnBigMap"
+            "Cdk_MainSettingsEntrance",
+            "[JumpBack]ReturnBigMap"
         ],
         "post_delay": 1000
     },
@@ -228,10 +221,8 @@
         "post_delay": 1000,
         "timeout": 2000,
         "next": [
-            "Cdk_Select_CdkEntrance"
-        ],
-        "interrupt": [
-            "BackText"
+            "Cdk_Select_CdkEntrance",
+            "[JumpBack]BackText"
         ]
     },
     "Cdk_Select_CdkEntrance": {
@@ -248,10 +239,8 @@
         "post_delay": 1000,
         "timeout": 2000,
         "next": [
-            "Cdk_Window"
-        ],
-        "interrupt": [
-            "BackText"
+            "Cdk_Window",
+            "[JumpBack]BackText"
         ]
     },
     "Cdk_Window": {
@@ -266,11 +255,9 @@
         "post_delay": 500,
         "timeout": 2000,
         "next": [
-            "Cdk_Select_Textbox"
-        ],
-        "interrupt": [
-            "Cdk_Select_CdkEntrance",
-            "BackText"
+            "Cdk_Select_Textbox",
+            "[JumpBack]Cdk_Select_CdkEntrance",
+            "[JumpBack]BackText"
         ]
     },
     "Cdk_Select_Textbox": {
@@ -288,11 +275,9 @@
         "post_delay": 1000,
         "timeout": 3000,
         "next": [
-            "Cdk_TextInputAction"
-        ],
-        "interrupt": [
-            "Cdk_Select_CdkEntrance",
-            "BackText"
+            "Cdk_TextInputAction",
+            "[JumpBack]Cdk_Select_CdkEntrance",
+            "[JumpBack]BackText"
         ]
     },
     "Cdk_TextInputAction": {
@@ -301,11 +286,9 @@
         "post_delay": 1000,
         "timeout": 2000,
         "next": [
-            "Cdk_Text_Confirm"
-        ],
-        "interrupt": [
-            "Cdk_Select_CdkEntrance",
-            "BackText"
+            "Cdk_Text_Confirm",
+            "[JumpBack]Cdk_Select_CdkEntrance",
+            "[JumpBack]BackText"
         ]
     },
     "Cdk_Text_Confirm": {
@@ -327,11 +310,9 @@
             "ConfirmButton",
             "Cdk_CheckResult_True",
             "Cdk_CheckResult_False",
-            "Cdk_CheckResult_Error"
-        ],
-        "interrupt": [
-            "Cdk_Select_CdkEntrance",
-            "BackText"
+            "Cdk_CheckResult_Error",
+            "[JumpBack]Cdk_Select_CdkEntrance",
+            "[JumpBack]BackText"
         ]
     },
     "Cdk_CheckResult_True": {

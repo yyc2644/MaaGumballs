@@ -1,10 +1,8 @@
 {
     "TSD_Entry": {
         "next": [
-            "TSD_GetInDomain"
-        ],
-        "interrupt": [
-            "TSD_BackToBigMap"
+            "TSD_GetInDomain",
+            "[JumpBack]TSD_BackToBigMap"
         ],
         "post_delay": 1000
     },
@@ -57,10 +55,8 @@
         "post_delay": 3000,
         "timeout": 2000,
         "next": [
-            "TSD_CheckInTSD"
-        ],
-        "interrupt": [
-            "TSD_CheckInOD"
+            "TSD_CheckInTSD",
+            "[JumpBack]TSD_CheckInOD"
         ]
     },
     "TSD_CheckInTSD": {
@@ -106,16 +102,14 @@
     },
     "TSD_ReturnFleet": {
         "next": [
-            "TSD_checkTargetFleetFree"
+            "TSD_checkTargetFleetFree",
+            "[JumpBack]TSD_View",
+            "[JumpBack]TSD_EndExploit",
+            "[JumpBack]TSD_WithdrawFleet",
+            "[JumpBack]BackText"
         ],
         "post_delay": 100,
-        "timeout": 2000,
-        "interrupt": [
-            "TSD_View",
-            "TSD_EndExploit",
-            "TSD_WithdrawFleet",
-            "BackText"
-        ]
+        "timeout": 2000
     },
     "TSD_checkFreeFleet": {
         "recognition": "TemplateMatch",
@@ -303,11 +297,9 @@
         "post_delay": 1000,
         "timeout": 2000,
         "next": [
-            "TSD_ClickFleetButton"
-        ],
-        "interrupt": [
-            "TSD_SelectCancelButton",
-            "ClickCenterBelow_500ms"
+            "TSD_ClickFleetButton",
+            "[JumpBack]TSD_SelectCancelButton",
+            "[JumpBack]ClickCenterBelow_500ms"
         ]
     },
     "TSD_ClickFleetButton": {
@@ -358,10 +350,8 @@
         "post_delay": 500,
         "timeout": 2000,
         "next": [
-            "TSD_ClickAttackButton"
-        ],
-        "interrupt": [
-            "BackText"
+            "TSD_ClickAttackButton",
+            "[JumpBack]BackText"
         ]
     },
     "TSD_CheckTargetFleetRun": {
