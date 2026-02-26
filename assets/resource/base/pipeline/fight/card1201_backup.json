@@ -1,0 +1,274 @@
+{
+    "Card": {
+        "next": [
+            "Card_Start",
+            "Card_Fighting",
+            "[JumpBack]AlchemyReward",
+            "[JumpBack]MapSwipeDownToUp"
+        ]
+    },
+    "Card_Start": {
+        "recognition": "TemplateMatch",
+        "template": "fight/Card/Card_entry.png",
+        "roi": [
+            461,
+            154,
+            202,
+            884
+        ],
+        "action": "Custom",
+        "custom_action": "Fight_PreWar",
+        "post_delay": 1000,
+        "timeout": 1500,
+        "next": [
+            "Card_Select",
+            "[JumpBack]PowerLack",
+            "[JumpBack]Select_MainWindow",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]ClickCenterBelow_500ms"
+        ]
+    },
+    "Card_Select": {
+        "recognition": "OCR",
+        "expected": "进入迷宫",
+        "roi": [
+            165,
+            871,
+            418,
+            91
+        ],
+        "action": "Custom",
+        "custom_action": "Fight_Select",
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "Card_EntryMaze"
+        ]
+    },
+    "Card_EntryMaze": {
+        "recognition": "OCR",
+        "expected": "进入迷宫",
+        "roi": [
+            165,
+            871,
+            418,
+            91
+        ],
+        "action": "Click",
+        "next": [
+            "Card_Fighting",
+            "[JumpBack]GameLoading"
+        ]
+    },
+    "Card_Fighting": {
+        "recognition": "TemplateMatch",
+        "template": "fight/UniversalUI/MazePackage.png",
+        "action": "Custom",
+        "custom_action": "Card101",
+        "roi": [
+            47,
+            1147,
+            136,
+            117
+        ]
+    },
+    "Card_Fight_ClearCurrentLayer": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "Card_Fight_ClearCurrentLayer",
+        "post_delay": 200,
+        "timeout": 1000
+    },
+    "Fight_ClearCurrentLayer_time_stop": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "Fight_ClearCurrentLayer_time_stop",
+        "post_delay": 300,
+        "timeout": 1000,
+        "next": [
+            "[JumpBack]Fight_OpenRewardBox",
+            "[JumpBack]BackText",
+            "[JumpBack]Fight_CheckOpenedDoor"
+        ]
+    },
+    "Card_StoneChest": {
+        "recognition": "TemplateMatch",
+        "template": "fight/Card/StoneChest.png",
+        "roi": [
+            4,
+            182,
+            705,
+            839
+        ],
+        "action": "Click",
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "Card_StoneChest_Open"
+        ]
+    },
+    "Card_StoneChest_Open": {
+        "recognition": "OCR",
+        "expected": [
+            "刻上名字",
+            "离开"
+        ],
+        "roi": [
+            21,
+            217,
+            682,
+            762
+        ],
+        "action": "Click",
+        "post_delay": 1000,
+        "timeout": 2000
+    },
+    "Card_Find_Body": {
+        "recognition": "TemplateMatch",
+        "template": [
+            "fight/Card/斯巴达尸体1.png",
+            "fight/Card/斯巴达尸体2.png"
+        ],
+        "roi": [
+            7,
+            179,
+            712,
+            821
+        ],
+        "action": "Click",
+        "threshold": 0.65,
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "Card_Inter_Confirm"
+        ]
+    },
+    "Card_Inter_Confirm": {
+        "recognition": "OCR",
+        "expected": [
+            "翻找",
+            "查看",
+            "确定",
+            "离开",
+            "刻上名字"
+        ],
+        "roi": [
+            88,
+            652,
+            548,
+            332
+        ],
+        "action": "Click",
+        "post_delay": 1000,
+        "timeout": 2000
+    },
+    "Card_Find_Abattoir": {
+        "recognition": "TemplateMatch",
+        "template": [
+            "fight/Card/Abattoir.png",
+            "fight/Card/Abattoir_1.png"
+        ],
+        "roi": [
+            7,
+            179,
+            712,
+            821
+        ],
+        "action": "Click",
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "Card_Abattoir_Entry"
+        ]
+    },
+    "Card_Abattoir_Entry": {
+        "recognition": "OCR",
+        "expected": [
+            "进入"
+        ],
+        "roi": [
+            88,
+            652,
+            548,
+            332
+        ],
+        "action": "Click",
+        "post_delay": 3000,
+        "timeout": 2000
+    },
+    "Card_Abattoir_Chest": {
+        "recognition": "TemplateMatch",
+        "template": [
+            "fight/Card/Chest_01.png"
+        ],
+        "roi": [
+            9,
+            690,
+            159,
+            237
+        ],
+        "action": "Click",
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "Card_Inter_Confirm"
+        ]
+    },
+    "Card_OpenForceOfNature": {
+        "recognition": "TemplateMatch",
+        "template": [
+            "fight/Card/自然之子技能.png",
+            "fight/Card/自然之子_春回大地.png"
+        ],
+        "roi": [
+            449,
+            75,
+            270,
+            152
+        ],
+        "action": "Click",
+        "post_delay": 100,
+        "timeout": 2000,
+        "next": [
+            "Card_OpenForceOfNature_Switch",
+            "Card_OpenForceOfNature_Fail"
+        ]
+    },
+    "Card_OpenForceOfNature_Switch": {
+        "recognition": "OCR",
+        "expected": [
+            "开启自然之力",
+            "开启自然守护"
+        ],
+        "roi": [
+            87,
+            652,
+            554,
+            287
+        ],
+        "action": "Click",
+        "post_delay": 0,
+        "timeout": 2000,
+        "next": [
+            "ClickCenter_200ms"
+        ]
+    },
+    "Card_OpenForceOfNature_Fail": {
+        "recognition": "OCR",
+        "expected": [
+            "关闭自然之力"
+        ],
+        "roi": [
+            87,
+            652,
+            554,
+            287
+        ],
+        "action": "DoNothing",
+        "post_delay": 200,
+        "timeout": 2000,
+        "next": [
+            "BackText_500ms"
+        ]
+    }
+}

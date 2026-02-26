@@ -456,3 +456,4 @@ grid/*
 
 # Log
 logs
+/.minimax

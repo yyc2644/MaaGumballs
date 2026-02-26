@@ -784,5 +784,49 @@
     },
     "Fight_ManualLeave": {
         "enabled": false
+    },
+    "CardSkill_Click": {
+        "recognition": "OCR",
+        "roi": [
+            50,
+            300,
+            500,
+            600
+        ],
+        "action": "Click",
+        "post_delay": 500,
+        "timeout": 2000
+    },
+    "CardSkill_Cast": {
+        "recognition": "OCR",
+        "roi": [
+            87,
+            652,
+            554,
+            287
+        ],
+        "action": "Click",
+        "post_delay": 0,
+        "timeout": 2000,
+        "next": [
+            "ClickCenter_200ms"
+        ]
+    },
+    "DragonHeart_Entrance": {
+        "recognition": "TemplateMatch",
+        "template": [
+            "fight/dragon_heart.png",
+            "fight/dragon_heart_entrance.png"
+        ],
+        "roi": [
+            0,
+            0,
+            720,
+            1280
+        ],
+        "action": "Click",
+        "threshold": 0.7,
+        "post_delay": 1000,
+        "timeout": 2000
     }
 }
