@@ -10,6 +10,7 @@ from action.fight.fightUtils import timing_decorator
 import time
 import cv2
 import numpy as np
+import json
 
 boss_x, boss_y = 360, 800
 
@@ -229,49 +230,7 @@ class Card1201(CustomAction):
         return True
 
     def handle_abattoir_event(self, context: Context):
-        image = context.tasker.controller.post_screencap().wait().get()
-        if (self.layers % 10 == 5 or self.layers % 10 == 4) and context.run_recognition(
-            "JJC_Find_Abattoir", image,
-        ).hit:
-            logger.info(f"进入角斗场战斗！！！")
-            context.run_task("JJC_Find_Abattoir")
-            if self.layers <= 35:
-                fightUtils.cast_magic("光", "祝福术", context)
-                for _ in range(3):
-                    fightUtils.cast_magic_special("天眼", context)
-            elif self.layers <= 45:
-                if not fightUtils.cast_magic("火", "失明术", context, (boss_x, boss_y)):
-                    fightUtils.cast_magic("暗", "诅咒术", context, (boss_x, boss_y))
-                for _ in range(3):
-                    if not fightUtils.cast_magic("光", "祝福术", context):
-                        if not fightUtils.cast_magic("水", "治疗术", context):
-                            fightUtils.cast_magic("土", "石肤术", context)
-            elif self.layers <= 55:
-                if not fightUtils.cast_magic("火", "失明术", context, (boss_x, boss_y)):
-                    fightUtils.cast_magic("暗", "诅咒术", context, (boss_x, boss_y))
-                for _ in range(3):
-                    if not fightUtils.cast_magic("水", "寒冰护盾", context):
-                        if not fightUtils.cast_magic("水", "治疗术", context):
-                            fightUtils.cast_magic("土", "石肤术", context)
-            elif self.layers <= 75:
-                for _ in range(2):
-                    context.run_task("Bag_Open")
-                    fightUtils.findItem("异域的灯芯", True, context, boss_x, boss_y)
-                for _ in range(3):
-                    if not fightUtils.cast_magic("水", "寒冰护盾", context):
-                        if not fightUtils.cast_magic("水", "治疗术", context):
-                            fightUtils.cast_magic("土", "石肤术", context)
-            else:
-                for _ in range(2):
-                    context.run_task("Bag_Open")
-                    fightUtils.findItem("异域的灯芯", True, context, boss_x, boss_y)
-            if context.run_recognition(
-                "Fight_Victory", context.tasker.controller.post_screencap().wait().get()
-            ).hit:
-                context.run_task("Fight_Victory")
-            time.sleep(2)
-            context.run_task("JJC_Abattoir_Chest")
-            context.run_task("Fight_OpenedDoor")
+        # Abattoir event disabled for Card mode
         return True
 
     def handle_small_monster_event(self, context: Context):
@@ -283,7 +242,7 @@ class Card1201(CustomAction):
         logger.info("施放四象封印(特殊魔法)")
         fightUtils.cast_magic_special("四象封印", context)
         time.sleep(0.5)
-        context.run_task("JJC_Fight_ClearCurrentLayer")
+        context.run_task("Card_Fight_ClearCurrentLayer")
         return True
 
     def handle_boss_event(self, context: Context):
@@ -292,29 +251,29 @@ class Card1201(CustomAction):
         time.sleep(3)
         logger.info("施放连斩×2")
         self.cast_card_skill("连斩", context)
-        time.sleep(0.3)
+        time.sleep(1)
         self.cast_card_skill("连斩", context)
-        time.sleep(0.3)
+        time.sleep(1)
         logger.info("施放冥想")
         self.cast_card_skill("冥想", context)
-        time.sleep(0.5)
+        time.sleep(1)
         logger.info("攻击Boss本体")
         context.tasker.controller.post_click(boss_x, boss_y).wait()
-        time.sleep(0.5)
+        time.sleep(1)
         logger.info("尝试进入龙之心房间")
         self.enter_dragon_heart_room(context)
         logger.info("施放梦魇技能(抽取心脏灵魂)")
         fightUtils.cast_magic_special("抽取心脏灵魂", context)
-        time.sleep(0.5)
+        time.sleep(1)
         logger.info("施放瓦解射线")
         fightUtils.cast_magic("气", "瓦解射线", context)
-        time.sleep(0.5)
+        time.sleep(1)
         logger.info("施放四象封印")
         fightUtils.cast_magic_special("四象封印", context)
-        time.sleep(0.5)
+        time.sleep(1)
         logger.info("攻击龙之心")
         self.attack_dragon_heart(context)
-        time.sleep(0.5)
+        time.sleep(1)
         logger.info("施放斩杀")
         fightUtils.cast_magic_special("斩杀", context)
         time.sleep(1)
@@ -329,11 +288,30 @@ class Card1201(CustomAction):
         context.run_task("Fight_OpenedDoor")
         return True
 
+    def handle_layer_start(self, context: Context) -> bool:
+        """
+        Per-layer start phase (pseudocode; fill in your own logic).
+
+        # 1) Check if Meditation exists
+        # if has_meditation():
+        #     # Path A: Meditation -> Four Symbols
+        #     cast_card_skill("Meditation")
+        #     cast_magic_special("FourSymbols")
+        #     return True
+
+        # 2) If no Meditation
+        # else:
+        #     # Path B: Mars-style floor-click flow
+        #     mars_like_floor_click_flow()
+        #     return True
+        """
+        return True
+
     @timing_decorator
     def handle_preLayers_event(self, context: Context):
         self.Check_DefaultEquipment(context)
         self.Check_DefaultTitle(context)
-        self.handle_abattoir_event(context)
+        # self.handle_abattoir_event(context)
         return True
 
     @timing_decorator
@@ -351,8 +329,8 @@ class Card1201(CustomAction):
         if not self.isHaveSealBook:
             for _ in range(3):
                 img = context.tasker.controller.post_screencap().wait().get()
-                if context.run_recognition("JJC_Find_Body", img).hit:
-                    context.run_task("JJC_Find_Body")
+                if context.run_recognition("Card_Find_Body", img).hit:
+                    context.run_task("Card_Find_Body")
                     self.isHaveSealBook = True
                     logger.info("已有封印之书，或找到封印之书了！！")
                     break
@@ -368,8 +346,8 @@ class Card1201(CustomAction):
 
     @timing_decorator
     def handle_stone_event(self, context: Context, image):
-        if self.layers <= 29 and context.run_recognition("JJC_StoneChest", image).hit:
-            context.run_task("JJC_StoneChest")
+        if self.layers <= 29 and context.run_recognition("Card_StoneChest", image).hit:
+            context.run_task("Card_StoneChest")
 
     def handle_auto_pickup_event(self, context: Context):
         logger.info("开启自动拾取, 等待动画结束")
@@ -401,15 +379,15 @@ class Card1201(CustomAction):
             if self.layers >= 1:
                 self.handle_small_monster_event(context)
             else:
-                context.run_task("JJC_Fight_ClearCurrentLayer")
+                context.run_task("Card_Fight_ClearCurrentLayer")
         return True
 
     @timing_decorator
     def handle_interrupt_event(self, context: Context):
         image = context.tasker.controller.post_screencap().wait().get()
-        if context.run_recognition("JJC_Inter_Confirm", image).hit:
+        if context.run_recognition("Card_Inter_Confirm", image).hit:
             logger.info("检测到卡剧情, 本层重新探索")
-            context.run_task("JJC_Inter_Confirm")
+            context.run_task("Card_Inter_Confirm")
             return False
         if context.run_recognition("BackText", image).hit:
             logger.info("检测到卡返回, 本层重新探索")
@@ -426,6 +404,8 @@ class Card1201(CustomAction):
             if not self.Check_CurrentLayers(context):
                 return CustomAction.RunResult(success=False)
             logger.info(f"Start Explore {self.layers} layer.")
+            if not self.handle_layer_start(context):
+                return CustomAction.RunResult(success=False)
             self.handle_preLayers_event(context)
             if self.layers == 95:
                 logger.info(f"current layers {self.layers}, 开始退出agent")
@@ -454,6 +434,29 @@ class JJC_Fight_ClearCurrentLayer(CustomAction):
         return CustomAction.RunResult(success=True)
 
 
+
+
+@AgentServer.custom_action("Card_Fight_ClearCurrentLayer")
+class Card_Fight_ClearCurrentLayer(CustomAction):
+    def __init__(self):
+        super().__init__()
+        self.fightProcessor = fightProcessor.FightProcessor()
+
+    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+        layers_arg = None
+        if argv.custom_action_param:
+            try:
+                layers_arg = json.loads(argv.custom_action_param).get("layers")
+            except Exception:
+                layers_arg = None
+        if layers_arg is not None:
+            try:
+                self.fightProcessor.layers = layers_arg
+            except Exception:
+                pass
+
+        self.fightProcessor.clearCurrentLayer(context, isclearall=True)
+        return CustomAction.RunResult(success=True)
 @AgentServer.custom_action("Fight_Select")
 class Fight_Select(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:

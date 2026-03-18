@@ -64,7 +64,7 @@
         "recognition": "TemplateMatch",
         "template": "fight/UniversalUI/MazePackage.png",
         "action": "Custom",
-        "custom_action": "Card101",
+        "custom_action": "Card1201",
         "roi": [
             47,
             1147,
@@ -124,11 +124,15 @@
         "post_delay": 1000,
         "timeout": 2000
     },
-    "Card_Find_Body": {
+    "Card_Find_Event": {
         "recognition": "TemplateMatch",
         "template": [
-            "fight/Card/斯巴达尸体1.png",
-            "fight/Card/斯巴达尸体2.png"
+            "fight/Card/哥布林.png",
+            "fight/Card/蛮牛.png",
+            "fight/Card/法师.png",
+            "fight/Card/蜉蝣.png",
+            "fight/Card/精灵.png",
+            "fight/Card/树妖.png"
         ],
         "roi": [
             7,
@@ -142,6 +146,45 @@
         "timeout": 2000,
         "next": [
             "Card_Inter_Confirm"
+        ]
+    },
+    "Card_Find_Store": {
+        "recognition": "TemplateMatch",
+        "template": [
+            "fight/Card/卷轴商店.png",
+            "fight/Card/装备商店.png"
+        ],
+        "roi": [
+            7,
+            179,
+            712,
+            821
+        ],
+        "action": "Click",
+        "threshold": 0.65,
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "Card_Inter_Confirm_todo"
+        ]
+    },
+    "Card_Find_Demon": {
+        "recognition": "TemplateMatch",
+        "template": [
+            "fight/Card/小恶魔.png"
+        ],
+        "roi": [
+            7,
+            179,
+            712,
+            821
+        ],
+        "action": "Click",
+        "threshold": 0.65,
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "Card_Inter_Confirm_todo"
         ]
     },
     "Card_Inter_Confirm": {
