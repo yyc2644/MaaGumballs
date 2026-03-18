@@ -65,28 +65,13 @@ class Card1201(CustomAction):
 
     @timing_decorator
     def Check_DefaultEquipment(self, context: Context):
-        if self.layers == 1 or self.layers == 26 or self.layers == 63:
+        if self.layers == 1:
             OpenDetail = context.run_task("Bag_Open")
             if OpenDetail.nodes:
                 if not fightUtils.checkEquipment("宝物", 7, "封印之书", context):
                     fightUtils.findEquipment(7, "封印之书", True, context)
                 time.sleep(1)
                 context.run_task("Fight_ReturnMainWindow")
-                logger.info(f"current layers {self.layers},装备检查完成")
-            else:
-                logger.info("背包打开失败")
-                return False
-        elif self.layers == 39:
-            OpenDetail = context.run_task("Bag_Open")
-            if OpenDetail.nodes:
-                if not fightUtils.checkEquipment("腰带", 1, "贵族丝带", context):
-                    fightUtils.findEquipment(1, "贵族丝带", True, context)
-                if not fightUtils.checkEquipment("戒指", 2, "礼仪戒指", context):
-                    fightUtils.findEquipment(2, "礼仪戒指", True, context)
-                if not fightUtils.checkEquipment("披风", 3, "天鹅绒斗篷", context):
-                    fightUtils.findEquipment(3, "天鹅绒斗篷", True, context)
-                if not fightUtils.checkEquipment("宝物", 7, "冒险家竖琴", context):
-                    fightUtils.findEquipment(7, "冒险家竖琴", True, context)
                 logger.info(f"current layers {self.layers},装备检查完成")
             else:
                 logger.info("背包打开失败")
@@ -134,6 +119,9 @@ class Card1201(CustomAction):
 
     @timing_decorator
     def Check_DefaultTitle(self, context: Context):
+        """
+        进图点
+        """
         if (self.layers == 1 or self.layers == 2) and self.isTitle_L1 == False:
             fightUtils.title_learn("冒险", 1, "寻宝者", 1, context)
             fightUtils.title_learn("冒险", 2, "勘探家", 3, context)

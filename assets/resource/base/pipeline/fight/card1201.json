@@ -72,6 +72,7 @@
             117
         ]
     },
+
     "Card_Fight_ClearCurrentLayer": {
         "recognition": "DirectHit",
         "action": "Custom",
@@ -146,11 +147,11 @@
     "Card_Inter_Confirm": {
         "recognition": "OCR",
         "expected": [
-            "翻找",
-            "查看",
-            "确定",
+            "放过",
+            "探索洞穴",
+            "砍伐",
             "离开",
-            "刻上名字"
+            "交流"
         ],
         "roi": [
             88,
@@ -267,8 +268,12 @@
         "action": "DoNothing",
         "post_delay": 200,
         "timeout": 2000,
+
+
         "next": [
             "BackText_500ms"
         ]
     }
 }
+
+
