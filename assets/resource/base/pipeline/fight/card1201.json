@@ -1,0 +1,86 @@
+{
+    "Card1201": {
+        "next": [
+            "Card1201_Start",
+            "Card1201_Fighting",
+            "[JumpBack]AlchemyReward",
+            "[JumpBack]MapIsTop",
+            "[JumpBack]MapSwipeDownToUp"
+        ]
+    },
+    "Card1201_Start": {
+        "recognition": "TemplateMatch",
+        "template": "fight/Card/Card_Entry.png",
+        "roi": [
+            15,
+            161,
+            691,
+            878
+        ],
+        "action": "Custom",
+        "custom_action": "Fight_PreWar",
+        "post_delay": 1000,
+        "timeout": 1500,
+        "next": [
+            "Card1201_Select",
+            "[JumpBack]PowerLack",
+            "[JumpBack]Select_MainWindow",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]ClickCenterBelow_500ms"
+        ]
+    },
+    "Card1201_Select": {
+        "recognition": "OCR",
+        "expected": "进入迷宫",
+        "roi": [
+            165,
+            871,
+            418,
+            91
+        ],
+        "action": "Custom",
+        "custom_action": "Fight_Select",
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "Card1201_EntryMaze"
+        ]
+    },
+    "Card1201_EntryMaze": {
+        "recognition": "OCR",
+        "expected": "进入迷宫",
+        "roi": [
+            165,
+            871,
+            418,
+            91
+        ],
+        "action": "Click",
+        "next": [
+            "Card1201_Fighting",
+            "[JumpBack]GameLoading"
+        ]
+    },
+    "Card1201_Fighting": {
+        "recognition": "TemplateMatch",
+        "template": "fight/UniversalUI/MazePackage.png",
+        "action": "Custom",
+        "custom_action": "Card1201",
+        "roi": [
+            47,
+            1147,
+            136,
+            117
+        ]
+    },
+    "Card_Fight_ClearCurrentLayer": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "Card_Fight_ClearCurrentLayer",
+        "custom_action_param": {
+            "layers": 1
+        },
+        "post_delay": 300,
+        "timeout": 1000
+    }
+}

@@ -349,6 +349,38 @@
             ]
         },
         {
+            "name": "卡牌幻境",
+            "entry": "Card1201",
+            "repeatable": true,
+            "repeat_count": 1,
+            "option": [
+                "自动肉鸽时使用钻石购买体力"
+            ],
+            "pipeline_override": {
+                "Select_WorldTree_InputBox_Text": {
+                    "input_text": "封印师"
+                },
+                "select_InputBox_Text1": {
+                    "input_text": "浴血战士"
+                },
+                "select_InputBox_Text2": {
+                    "input_text": "梦魇之子"
+                }
+            },
+            "doc": [
+                "## 卡牌幻境自动化说明",
+                "### 当前状态",
+                "- 已建立任务入口、pipeline骨架和Python自定义动作模块",
+                "- 已按旧按键精灵脚本转换小怪层、Boss层、搜刮、下楼、暂离、神龙和钻石购买体力流程",
+                "- 图片识别相关步骤已保留为Python占位，等待补充真实模板或识别节点",
+                "- 默认阵容：封印师 + 浴血战士(灵魂链接) + 梦魇之子(灵魂链接)",
+                "",
+                "### 开发提示",
+                "- 入口图片占位为 `fight/Card/Card_Entry.png`，需要后续补充真实模板图",
+                "- 局内逻辑入口为 `Card1201`，清层入口为 `Card_Fight_ClearCurrentLayer`"
+            ]
+        },
+        {
             "name": "神锻系列",
             "entry": "DivineForgeLand_Start",
             "option": [
