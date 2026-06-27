@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import json
 import time
+from enum import Enum
 
 from maa.agent.agent_server import AgentServer
 from maa.context import Context
@@ -22,6 +23,155 @@ LEGACY_SCREEN_WIDTH = 1280
 LEGACY_SCREEN_HEIGHT = 2772
 TARGET_SCREEN_WIDTH = 720
 TARGET_SCREEN_HEIGHT = 1280
+
+
+class CardImageKey(str, Enum):
+    """卡牌幻境图片模板占位枚举。"""
+
+    ENTRY = "入口-卡牌幻境"
+    SMALL_CARD_PANEL = "小怪层-卡牌面板"
+    SMALL_CONFIRM_1 = "小怪层-居中确认1"
+    SMALL_CONFIRM_2 = "小怪层-居中确认2"
+    BOSS_CARD_PANEL = "Boss-卡牌面板"
+    BOSS_HEART_ENTRY = "Boss-幻境入口"
+    FOUR_SYMBOLS_BOOK_MAX = "四象之书满级"
+    DOWNSTAIRS = "下楼-楼梯"
+    MAGE_EVENT = "事件-法师"
+    BULL_EVENT = "事件-蛮牛"
+    TREE_EVENT = "事件-树妖"
+    EQUIPMENT_SHOP = "事件-装备商店"
+    SCROLL_SHOP = "事件-卷轴商店"
+    SHOP_CLOSE = "商店-关闭"
+    SHOP_CONFIRM = "商店-确认购买"
+    DRAGON = "事件-神龙"
+    ARTHUR_ROUND_TABLE = "事件-亚瑟王圆桌"
+    GUIDE_BUILDING = "事件-攻略建筑选项"
+    TEMPORARY_LEAVE_FINISH = "暂离-完成提示"
+    UNKNOWN = "未知图片占位"
+
+
+@dataclass(frozen=True)
+class CardImagePlaceholder:
+    """需要后续补图的图片模板信息。"""
+
+    key: CardImageKey
+    template: str
+    area: str | None = None
+    similar: int = 90
+    note: str = ""
+
+
+CARD_IMAGE_PLACEHOLDERS: dict[CardImageKey, CardImagePlaceholder] = {
+    CardImageKey.ENTRY: CardImagePlaceholder(
+        CardImageKey.ENTRY,
+        "fight/Card/Card_Entry.png",
+        note="大地图卡牌幻境入口；补好后才能从大地图自动进入。",
+    ),
+    CardImageKey.SMALL_CARD_PANEL: CardImagePlaceholder(
+        CardImageKey.SMALL_CARD_PANEL,
+        "fight/Card/Card_Small_CardPanel.png",
+        "3.2% 26.9% 99.3% 81.6%",
+        note="小怪层卡牌/封印书入口。",
+    ),
+    CardImageKey.SMALL_CONFIRM_1: CardImagePlaceholder(
+        CardImageKey.SMALL_CONFIRM_1,
+        "fight/Card/Card_Small_Confirm1.png",
+        note="小怪层冥想后的居中确认条件1。",
+    ),
+    CardImageKey.SMALL_CONFIRM_2: CardImagePlaceholder(
+        CardImageKey.SMALL_CONFIRM_2,
+        "fight/Card/Card_Small_Confirm2.png",
+        note="小怪层冥想后的居中确认条件2。",
+    ),
+    CardImageKey.BOSS_CARD_PANEL: CardImagePlaceholder(
+        CardImageKey.BOSS_CARD_PANEL,
+        "fight/Card/Card_Boss_CardPanel.png",
+        "1.9% 68.5% 42.3% 83.7%",
+        note="Boss层卡牌/封印书入口。",
+    ),
+    CardImageKey.BOSS_HEART_ENTRY: CardImagePlaceholder(
+        CardImageKey.BOSS_HEART_ENTRY,
+        "fight/Card/Card_Boss_HeartEntry.png",
+        "80.5% 52.8% 97.3% 65.3%",
+        note="Boss进入龙心/幻境入口。",
+    ),
+    CardImageKey.FOUR_SYMBOLS_BOOK_MAX: CardImagePlaceholder(
+        CardImageKey.FOUR_SYMBOLS_BOOK_MAX,
+        "fight/Card/Card_FourSymbolsBook_Max.png",
+        "0% 9.4% 100% 81.3%",
+        note="四象之书满级状态；满级前禁止使用四象封印。",
+    ),
+    CardImageKey.DOWNSTAIRS: CardImagePlaceholder(
+        CardImageKey.DOWNSTAIRS,
+        "fight/Card/Card_Downstairs.png",
+        "0.3% 26.2% 98.9% 82.1%",
+        93,
+        "下楼楼梯。",
+    ),
+    CardImageKey.MAGE_EVENT: CardImagePlaceholder(
+        CardImageKey.MAGE_EVENT,
+        "fight/Card/Card_Event_Mage.png",
+        "0.3% 28.5% 98.6% 81.2%",
+        note="法师事件入口。",
+    ),
+    CardImageKey.BULL_EVENT: CardImagePlaceholder(
+        CardImageKey.BULL_EVENT,
+        "fight/Card/Card_Event_Bull.png",
+        "0.3% 28.5% 98.6% 81.2%",
+        note="蛮牛事件入口。",
+    ),
+    CardImageKey.TREE_EVENT: CardImagePlaceholder(
+        CardImageKey.TREE_EVENT,
+        "fight/Card/Card_Event_Tree.png",
+        "0.3% 28.5% 98.6% 81.2%",
+        94,
+        "树妖事件入口。",
+    ),
+    CardImageKey.EQUIPMENT_SHOP: CardImagePlaceholder(
+        CardImageKey.EQUIPMENT_SHOP,
+        "fight/Card/Card_Event_EquipmentShop.png",
+        "0.9% 27% 97.9% 81.3%",
+        note="装备商店入口。",
+    ),
+    CardImageKey.SCROLL_SHOP: CardImagePlaceholder(
+        CardImageKey.SCROLL_SHOP,
+        "fight/Card/Card_Event_ScrollShop.png",
+        note="卷轴商店入口。",
+    ),
+    CardImageKey.SHOP_CLOSE: CardImagePlaceholder(
+        CardImageKey.SHOP_CLOSE,
+        "fight/Card/Card_Shop_Close.png",
+        "62.9% 94.4% 96.2% 106.8%",
+        note="商店关闭按钮。",
+    ),
+    CardImageKey.SHOP_CONFIRM: CardImagePlaceholder(
+        CardImageKey.SHOP_CONFIRM,
+        "fight/Card/Card_Shop_Confirm.png",
+        "20.6% 62% 81.5% 71.6%",
+        note="商店确认购买弹窗。",
+    ),
+    CardImageKey.DRAGON: CardImagePlaceholder(
+        CardImageKey.DRAGON,
+        "fight/Card/Card_Event_Dragon.png",
+        "23.9% 20.4% 80.6% 50.8%",
+        note="神龙事件；当前优先走通用神龙识别。",
+    ),
+    CardImageKey.ARTHUR_ROUND_TABLE: CardImagePlaceholder(
+        CardImageKey.ARTHUR_ROUND_TABLE,
+        "fight/Card/Card_Event_ArthurRoundTable.png",
+        note="亚瑟王圆桌会议；当前优先走OCR。",
+    ),
+    CardImageKey.GUIDE_BUILDING: CardImagePlaceholder(
+        CardImageKey.GUIDE_BUILDING,
+        "fight/Card/Card_Event_GuideBuilding.png",
+        note="攻略建筑/事件选项；当前优先走OCR。",
+    ),
+    CardImageKey.TEMPORARY_LEAVE_FINISH: CardImagePlaceholder(
+        CardImageKey.TEMPORARY_LEAVE_FINISH,
+        "fight/Card/Card_TemporaryLeave_Finish.png",
+        note="暂离完成提示。",
+    ),
+}
 
 
 @dataclass
@@ -137,6 +287,23 @@ class CardState:
     warned_missing_dragon_power: bool = False
 
 
+@dataclass
+class CardStats:
+    """卡牌幻境全局养成状态：跨楼层累计，决定攻略分支是否可用。"""
+
+    # 四象之书是否已经满级。只有满级后才允许使用四象封印。
+    is_four_symbols_book_maxed: bool = False
+    # 是否已经获得四象封印卡牌/技能。
+    has_four_symbols_seal: bool = False
+    # 当前手牌上限，后续实测 OCR 后可更新。
+    hand_limit: int = 0
+    # 当前抽牌冷却缩减或抽牌数量收益，先记录是否拿过相关小恶魔收益。
+    has_draw_cooldown_bonus: bool = False
+    has_draw_count_bonus: bool = False
+    # 是否已经拿过蛮牛拓印符号，后续可用于判断是否继续处理蛮牛。
+    has_bull_rubbing_symbol: bool = False
+
+
 @AgentServer.custom_action("Card1201")
 class Card1201(CustomAction):
     """卡牌幻境自动化入口。
@@ -149,10 +316,12 @@ class Card1201(CustomAction):
         super().__init__()
         self.config = CardConfig()
         self.state = CardState()
+        self.stats = CardStats()
 
     def reset_state(self):
-        """重置局内运行态，保留本次任务配置。"""
+        """重置局内运行态和全局养成态，保留本次任务配置。"""
         self.state = CardState()
+        self.stats = CardStats()
 
     @property
     def layers(self):
@@ -212,19 +381,40 @@ class Card1201(CustomAction):
             desc=desc,
         )
 
-    def _image_hit_placeholder(self, context: Context, name, area=None, similar=90):
+    def _image_meta(self, image_key):
+        """读取图片占位元信息。"""
+        if isinstance(image_key, CardImageKey):
+            return CARD_IMAGE_PLACEHOLDERS[image_key]
+        for meta in CARD_IMAGE_PLACEHOLDERS.values():
+            if meta.key.value == image_key:
+                return meta
+        return CardImagePlaceholder(
+            key=CardImageKey.UNKNOWN,
+            template=f"fight/Card/TODO_{str(image_key).replace(' ', '_')}.png",
+            note=str(image_key),
+        )
+
+    def _image_hit_placeholder(self, context: Context, image_key, area=None, similar=None):
         """图片识别占位：后续补模板后，在这里替换成 run_recognition 或 pipeline 节点。"""
+        meta = self._image_meta(image_key)
+        area = area if area is not None else meta.area
+        similar = similar if similar is not None else meta.similar
         logger.debug(
-            f"卡牌幻境图片识别占位：{name}, area={area}, similar={similar}，当前默认未命中"
+            f"卡牌幻境图片识别占位：{meta.key.value}, template={meta.template}, "
+            f"area={area}, similar={similar}，当前默认未命中"
         )
         return False
 
     def _click_image_placeholder(
-        self, context: Context, name, area=None, similar=90, delay=0
+        self, context: Context, image_key, area=None, similar=None, delay=0
     ):
         """点击图片占位：旧脚本只有搜索范围，真正落点等补模板后由识别结果决定。"""
+        meta = self._image_meta(image_key)
+        area = area if area is not None else meta.area
+        similar = similar if similar is not None else meta.similar
         logger.info(
-            f"卡牌幻境图片点击占位：{name}，area={area}, similar={similar}，当前不点击"
+            f"卡牌幻境图片点击占位：{meta.key.value}，template={meta.template}, "
+            f"area={area}, similar={similar}，当前不点击"
         )
         self._sleep_after_action(delay)
         return False
@@ -262,27 +452,68 @@ class Card1201(CustomAction):
         """点击屏幕中部目标，适合释放卡牌/魔法后的确认或攻击龙心。"""
         return self._tap_percent(context, "50%", "50%", delay=delay, desc=desc)
 
+    def _use_four_symbols_seal(self, context: Context, delay=0.5, desc="四象封印"):
+        """使用四象封印。四象之书未满级时禁止使用，避免攻略节奏被打乱。"""
+        if not self.stats.is_four_symbols_book_maxed:
+            logger.info("四象之书尚未满级，跳过四象封印")
+            return False
+        used = self._use_card_skill(
+            context, ["四象封印", "四象"], delay=delay, desc=desc
+        )
+        if used:
+            self.stats.has_four_symbols_seal = True
+        return used
+
+    def update_four_symbols_book_stats(self, context: Context):
+        """更新四象之书状态。图片模板未补前，优先尝试 OCR 文案。"""
+        if self.stats.is_four_symbols_book_maxed:
+            return True
+        image = context.tasker.controller.post_screencap().wait().get()
+        candidates = fightUtils.ocr_text_candidates(
+            context,
+            ["四象之书", "满级", "Lv.MAX", "MAX", "已满级"],
+            roi=[0, 120, 720, 920],
+            image=image,
+        )
+        for candidate in candidates:
+            text = fightUtils.normalize_ocr_text(getattr(candidate, "text", ""))
+            if "四象之书" in text and (
+                "满级" in text or "MAX" in text.upper() or "已满级" in text
+            ):
+                self.stats.is_four_symbols_book_maxed = True
+                self.stats.has_four_symbols_seal = True
+                logger.info("检测到四象之书已满级，允许使用四象封印")
+                return True
+        if self._image_hit_placeholder(
+            context,
+            CardImageKey.FOUR_SYMBOLS_BOOK_MAX,
+        ):
+            self.stats.is_four_symbols_book_maxed = True
+            self.stats.has_four_symbols_seal = True
+            logger.info("通过图片占位检测到四象之书已满级")
+            return True
+        return False
+
     def run_small_monster_layer_script(self, context: Context):
         """按攻略处理小怪层：冥想补能量，四象封印清场。"""
         logger.info("执行卡牌幻境小怪层攻略流程：冥想 + 四象封印")
         self._click_image_placeholder(
-            context, "小怪层-卡牌", area="3.2% 26.9% 99.3% 81.6%"
+            context, CardImageKey.SMALL_CARD_PANEL
         )
         self._use_card_skill(context, ["冥想"], desc="小怪层-冥想")
         self._attack_center(context, delay=0.5, desc="小怪层-释放冥想")
 
         # 旧脚本这里有两个带图片条件的居中点击，先保留占位，等模板补齐后再决定是否执行。
-        if self._image_hit_placeholder(context, "小怪层-居中确认1"):
+        if self._image_hit_placeholder(context, CardImageKey.SMALL_CONFIRM_1):
             self._attack_center(context, desc="小怪层-居中确认1")
-        if self._image_hit_placeholder(context, "小怪层-居中确认2"):
+        if self._image_hit_placeholder(context, CardImageKey.SMALL_CONFIRM_2):
             self._attack_center(context, desc="小怪层-居中确认2")
 
-        self._click_image_placeholder(context, "小怪层-法术入口")
         self._click_text_placeholder(
             context, "特殊", area="13.6% 77.1% 75.5% 85.3%"
         )
-        self._use_card_skill(context, ["四象封印", "四象"], delay=0.5, desc="小怪层-四象封印")
-        self._attack_center(context, desc="小怪层-释放四象")
+        if self._use_four_symbols_seal(context, delay=0.5, desc="小怪层-四象封印"):
+            self._attack_center(context, desc="小怪层-释放四象")
         return True
 
     def run_boss_layer_script(self, context: Context):
@@ -294,7 +525,7 @@ class Card1201(CustomAction):
             return True
 
         self._click_image_placeholder(
-            context, "Boss-卡牌", area="1.9% 68.5% 42.3% 83.7%", delay=7
+            context, CardImageKey.BOSS_CARD_PANEL, delay=7
         )
         self._use_card_skill(context, ["连斩"], delay=0.5, desc="Boss-连斩1")
         self._attack_center(context, delay=1, desc="Boss-连斩1攻击")
@@ -316,7 +547,7 @@ class Card1201(CustomAction):
             desc="Boss-进入幻境",
         )
         self._click_image_placeholder(
-            context, "Boss-层层入口", area="84.1% 10.9% 100% 18.7%", delay=5
+            context, CardImageKey.BOSS_HEART_ENTRY, delay=5
         )
         self._click_text_by_priority(
             context,
@@ -335,25 +566,27 @@ class Card1201(CustomAction):
             )
             self._attack_center(context, delay=0.5, desc="Boss-瓦解确认")
 
-        self._use_card_skill(context, ["四象封印", "四象"], delay=1, desc="Boss-四象封印")
-        self._attack_center(context, delay=2, desc="Boss-A龙心斩杀")
+        if self._use_four_symbols_seal(context, delay=1, desc="Boss-四象封印"):
+            self._attack_center(context, delay=2, desc="Boss-A龙心斩杀")
+        else:
+            logger.warning("Boss 层跳过四象封印，尝试直接攻击龙心兜底")
+            self._attack_center(context, delay=2, desc="Boss-A龙心兜底")
         context.run_task("Fight_ReturnMainWindow")
         return True
 
     def run_loot_all_script(self, context: Context):
         """转换自 `整体搜刮.zjs`：按事件图片识别结果分发搜刮脚本。"""
         logger.info("执行卡牌幻境整体搜刮脚本")
-        if self._image_hit_placeholder(context, "搜刮-法师"):
+        if self._image_hit_placeholder(context, CardImageKey.MAGE_EVENT):
             self.run_loot_mage_script(context)
-        if self._image_hit_placeholder(
-            context, "搜刮-装备商店", area="0.9% 27% 97.9% 81.3%"
-        ):
+        if self._image_hit_placeholder(context, CardImageKey.TREE_EVENT):
+            self.run_loot_tree_script(context)
+        if self._image_hit_placeholder(context, CardImageKey.BULL_EVENT):
+            self.run_loot_bull_script(context)
+        if self._image_hit_placeholder(context, CardImageKey.EQUIPMENT_SHOP):
             self.run_loot_equipment_script(context)
-        if self._image_hit_placeholder(context, "搜刮-卷轴"):
+        if self._image_hit_placeholder(context, CardImageKey.SCROLL_SHOP):
             self.run_loot_scroll_script(context)
-        # 旧脚本中的蛮牛搜刮处于禁用状态，这里同样保留但不主动执行。
-        # if self._image_hit_placeholder(context, "搜刮-蛮牛", area="3.5% 28.4% 99.8% 82%"):
-        #     self.run_loot_bull_script(context)
         return True
 
     def run_guide_building_choice_script(self, context: Context):
@@ -389,13 +622,19 @@ class Card1201(CustomAction):
             self.state.maybe_has_magic_shell = True
             logger.info("攻略事件：记录可能已获得魔力贝壳")
         elif "手牌上限" in selected or "抽牌" in selected:
+            if "冷却" in selected:
+                self.stats.has_draw_cooldown_bonus = True
+            if "数量" in selected:
+                self.stats.has_draw_count_bonus = True
+            if "手牌上限" in selected:
+                self.stats.hand_limit += 1
             logger.info(f"攻略事件：小恶魔选择收益项 {selected}")
         return True
 
     def run_loot_mage_script(self, context: Context):
         """转换自 `搜刮法师.zjs`：法师事件交流。"""
         self._click_image_placeholder(
-            context, "搜刮法师-法师", area="2.8% 27.8% 98.7% 81.7%", delay=1
+            context, CardImageKey.MAGE_EVENT, delay=1
         )
         if self._click_text_placeholder(
             context, "交流", area="13.3% 54.8% 86.9% 80.2%", delay=0.5
@@ -407,17 +646,19 @@ class Card1201(CustomAction):
     def run_loot_bull_script(self, context: Context):
         """转换自 `搜刮蛮牛.zjs`：蛮牛事件拓印符号。"""
         self._click_image_placeholder(
-            context, "搜刮蛮牛-蛮牛", area="2.8% 27.8% 98.7% 81.7%"
+            context, CardImageKey.BULL_EVENT
         )
-        self._click_text_placeholder(
+        if self._click_text_placeholder(
             context, "拓印符号", area="13.3% 54.8% 86.9% 80.2%"
-        )
+        ):
+            self.stats.has_bull_rubbing_symbol = True
+            logger.info("已处理蛮牛拓印符号")
         return True
 
     def run_loot_tree_script(self, context: Context):
         """转换自 `搜刮树妖.zjs`：树妖事件交流。"""
         self._click_image_placeholder(
-            context, "搜刮树妖-树妖", area="2.8% 27.8% 98.7% 81.7%", delay=0.5
+            context, CardImageKey.TREE_EVENT, delay=0.5
         )
         self._click_text_placeholder(
             context, "交流", area="13.3% 54.8% 86.9% 80.2%", delay=0.5
@@ -427,7 +668,7 @@ class Card1201(CustomAction):
     def run_loot_equipment_script(self, context: Context):
         """转换自 `搜刮装备.zjs`：商店购买前两件装备。"""
         self._click_image_placeholder(
-            context, "装备商店-购物", area="2.8% 27.8% 98.7% 81.7%", delay=0.5
+            context, CardImageKey.EQUIPMENT_SHOP, delay=0.5
         )
         self._tap_percent(context, "23.5%", "52.5%", delay=0.5, desc="装备商店-第一件")
         self._click_text_placeholder(
@@ -437,16 +678,14 @@ class Card1201(CustomAction):
         self._click_text_placeholder(
             context, "确认购买", area="10.7% 68.5% 91.1% 80.7%", delay=0.5
         )
-        if self._image_hit_placeholder(
-            context, "装备商店-关闭", area="65.8% 96.2% 94.8% 106.8%"
-        ):
+        if self._image_hit_placeholder(context, CardImageKey.SHOP_CLOSE):
             self._tap_percent(context, "81%", "103.1%", desc="装备商店-关闭")
         return True
 
     def run_loot_scroll_script(self, context: Context):
         """转换自 `搜刮卷轴.zjs`：卷轴商店购买四个位置。"""
         self._click_image_placeholder(
-            context, "卷轴商店-购物", area="2.8% 27.8% 98.7% 81.7%"
+            context, CardImageKey.SCROLL_SHOP
         )
         for x, y, delay, desc in [
             ("23.5%", "52.5%", 0, "卷轴商店-第一件"),
@@ -455,13 +694,9 @@ class Card1201(CustomAction):
             ("23.9%", "67.3%", 0, "卷轴商店-第四件"),
         ]:
             self._tap_percent(context, x, y, delay=delay, desc=desc)
-            if self._image_hit_placeholder(
-                context, "卷轴商店-确认购买", area="20.6% 62% 81.5% 71.6%"
-            ):
+            if self._image_hit_placeholder(context, CardImageKey.SHOP_CONFIRM):
                 self._tap_percent(context, "51.2%", "67.1%", desc="卷轴商店-确认购买")
-        if self._image_hit_placeholder(
-            context, "卷轴商店-关闭", area="62.9% 94.4% 96.2% 106.8%"
-        ):
+        if self._image_hit_placeholder(context, CardImageKey.SHOP_CLOSE):
             self._tap_percent(context, "79.6%", "102.2%", desc="卷轴商店-关闭")
         return True
 
@@ -469,7 +704,7 @@ class Card1201(CustomAction):
         """转换自 `下楼.zjs`：优先保留旧脚本下楼点，随后用通用下楼兜底。"""
         logger.info("执行卡牌幻境下楼脚本")
         self._click_image_placeholder(
-            context, "下楼-楼梯", area="0.6% 26.5% 99% 81.5%", delay=1
+            context, CardImageKey.DOWNSTAIRS, delay=1
         )
         return fightUtils.handle_downstair_event(context)
 
@@ -544,6 +779,7 @@ class Card1201(CustomAction):
 
     @timing_decorator
     def handle_preLayers_event(self, context: Context):
+        self.update_four_symbols_book_stats(context)
         self.hp_manager.Check_DefaultStatus(context)
         return True
 
