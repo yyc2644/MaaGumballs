@@ -458,3 +458,4 @@ grid/*
 logs
 python/
 settings.local.json
+/.minimax
