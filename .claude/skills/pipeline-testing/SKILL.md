@@ -50,6 +50,51 @@ for node_name in pipeline_nodes:
 }
 ```
 
+## `run_task()` 结果判断 ⚠️
+
+MCP 的 `run_pipeline` 单节点结果和 Python CustomAction 里的 `context.run_task()` 结果不是同一个使用场景。`context.run_task()` 的 `result.nodes` 可能包含:
+
+- 真正命中并执行完成的节点
+- `next` 列表里被尝试过但失败的节点
+- 调试面板显示红叉的节点
+
+因此不要写:
+
+```python
+# ❌ 错：有 nodes 不代表目标节点命中
+result = context.run_task("AutoSky_CloneDied")
+if result and result.nodes:
+    handle_clone_loss()
+```
+
+应该检查节点是否真的完成或识别命中:
+
+```python
+def task_result_has_hit(result, names: set[str]) -> bool:
+    if not result or not result.nodes:
+        return False
+    for node in result.nodes:
+        if getattr(node, "name", None) not in names:
+            continue
+        if getattr(node, "completed", False):
+            return True
+        recognition = getattr(node, "recognition", None)
+        if recognition and getattr(recognition, "hit", False):
+            return True
+    return False
+```
+
+实战信号：调试面板里目标节点是红叉，但日志却进入了成功分支，基本就是把"节点出现过"误当成"节点命中"。
+
+对于会回到稳定页面的流程，建议先检测稳定状态:
+
+```python
+if task_result_has_hit(result, {"AutoSky_CheckExplorationInfo"}):
+    return "done"
+```
+
+再跑危险兜底动作（取消结算、购买确认、继续挑战等），避免页面已经回稳后误触发。
+
 ## 跨测试导航 ⚠️
 
 **Click 节点会让页面跳转，破坏后续测试初始状态**。必须用 `BackButton_500ms` 返回：
@@ -165,6 +210,78 @@ run_pipeline(..., entry="BackButton_500ms", ...)
 - 例：训练所 → BackButton → 回到城堡（正常）
 
 测试前先确认 BackButton 路径，或者用 `ocr()` 检查当前页面状态再继续。
+
+## ⚠️ MCP `start_agent=true` 失败时的 Fallback 方案
+
+**症状**:`run_pipeline(..., start_agent=true)` 报
+```
+Agent 启动失败: Agent 启动失败 (identifier=12345): connect() 返回 False
+```
+
+**根因**(常见):
+1. MaaFramework 的 agent 子进程(socket 进程)未在预期时间窗口内完成 `MaaAgentServerStartUp`
+2. Socket 路径冲突 / 权限问题
+3. MaaFramework 内部 `MaaAgentServerNotImpl`(这个错误明确说"用 MaaFramework,不要用 MaaAgentServer")
+
+**Fallback 1:单节点测试**(推荐):
+
+用 `start_agent=false` + 指定 `entry` 测单个节点(只测 OCR/Template 识别,跳过 CustomAction 链):
+
+```python
+# 不开 agent,直接测某个节点
+result = run_pipeline(
+    controller_id=cid,
+    pipeline_path="f:/workspace/MaaGumballs/assets/resource/base/pipeline/sky.json",
+    entry="AutoSky_BagConfig",   # 任意节点名
+    resource_path="f:/workspace/MaaGumballs/assets/resource/base",
+    start_agent=False,          # ← 关键:false
+)
+```
+
+**适用场景**:测 OCR / TemplateMatch / ColorMatch 等识别节点的 ROI 和 expected 文本是否正确。
+
+**Fallback 2:手动启动 agent 后 MCP 通过 socket 连接**:
+
+如果单节点测试不够(需测完整任务链),手动跑 agent 进程,然后用 `connect_adb_device` / `connect_window` 让 MCP 复用。
+
+```python
+# 步骤 1:手动启动 agent
+import subprocess
+agent_proc = subprocess.Popen(
+    ["python", "agent/main.py", "test_socket"],
+    cwd=".",
+)
+
+# 步骤 2:让 MCP 连接(需要 MCP 内部 socket ID 匹配)
+# 实际中,MCP 启动 agent 会自动起 socket,如果手动起需要 MCP 端配对
+# 通常这一步是 MCP 内部行为,我们无法直接控制
+```
+
+**Fallback 3:放弃 MCP,直接用 MaaFramework Python API**:
+
+```python
+import sys
+sys.path.insert(0, "f:/workspace/MaaGumballs")
+from maa.agent.agent_server import AgentServer
+from maa.toolkit import Toolkit
+from maa.resource import Resource
+from maa.controller import AdbController
+from maa.tasker import Tasker
+
+Toolkit.init_option("./")
+res = Resource(); res.post_bundle("./assets/resource/base").wait()
+ctrl = AdbController(adb_path="adb", address="127.0.0.1:16384"); ctrl.post_connection().wait()
+tasker = Tasker(); tasker.bind(res, ctrl)
+
+import action.sky
+autosky = action.sky.AutoSky()
+result = autosky.run(tasker.context, type('X', (), {'custom_action_param': '{}'})())
+```
+
+**何时用哪种**:
+- **Fallback 1**(单节点):调试 ROI / expected / TemplateMatch,快速迭代 → **首选**
+- **Fallback 3**(直接 API):测完整 task 链,真实环境验证 → MCP 不可用时用
+- **Fallback 2**(手动起 agent):通常不需要,MCP 会自动处理
 
 ## 测试模板
 

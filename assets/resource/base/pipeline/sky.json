@@ -101,6 +101,9 @@
             "AutoSky_Enter_Radar_Interface"
         ]
     },
+    "AutoSky_SkyExplore_CheckUI": {
+        "doc": "检查当前是否在天空快速探索的页面"
+    },
     "AutoSky_SkyExplore_Start": {
         "recognition": "OCR",
         "doc": "这一步是在快捷探索界面点击自动探索按钮",
@@ -130,28 +133,18 @@
         "post_delay": 500,
         "timeout": 5000,
         "next": [
-            "AutoSky_SkyExplore_Finish"
-        ]
-    },
-    "AutoSky_SkyExplore_Finish": {
-        "recognition": "OCR",
-        "doc": "识别到返回，说明本次自动探索消耗了能量，需要再次进入雷达界面检测一下有没有可以打的",
-        "expected": "返回",
-        "roi": [
-            494,
-            1173,
-            184,
-            75
-        ],
-        "post_delay": 500,
-        "timeout": 2000,
-        "action": "Click",
-        "next": [
-            "AutoSky_Enter_Radar_Interface",
-            "[JumpBack]BackText"
+            "BackText"
         ]
     },
     "AutoSky_Enter_Radar_Interface": {
+        "focus": {
+            "Node.Action.Succeeded": {
+                "content": "正在进入雷达界面",
+                "display": [
+                    "log"
+                ]
+            }
+        },
         "recognition": "TemplateMatch",
         "doc": "点击这个小按钮进入雷达界面",
         "template": "dailyTask/AutoSky_Enter_Radar_Interface.png",
@@ -170,6 +163,20 @@
         ]
     },
     "AutoSky_CheckExplorationInfo": {
+        "focus": {
+            "Node.Action.Succeeded": {
+                "content": "确定已经来到了雷达界面",
+                "display": [
+                    "log"
+                ]
+            },
+            "Node.Action.Failed": {
+                "content": "当前不在雷达界面",
+                "display": [
+                    "log"
+                ]
+            }
+        },
         "recognition": "OCR",
         "doc": "确定已经来到了雷达界面",
         "expected": "探索信息",
@@ -180,8 +187,65 @@
             159
         ],
         "post_delay": 500,
-        "timeout": 5000,
+        "timeout": 2000,
         "next": []
+    },
+    "AutoSky_CheckEnergyZero": {
+        "recognition": "OCR",
+        "doc": "检查右上角能量条 0/X - 能量为 0 时 hit(正则 '0/\\\\d+' 匹配 0/任何数字,不受 cap 变化影响)",
+        "expected": [
+            "0/"
+        ],
+        "roi": [
+            533,
+            790,
+            181,
+            57
+        ],
+        "color_filter": "AutoSky_GreenCheck",
+        "post_delay": 200,
+        "timeout": 2000,
+        "action": "DoNothing"
+    },
+    "AutoSky_CheckNodeCountZero": {
+        "recognition": "OCR",
+        "doc": "检查右下角 0/23 - 节点数为 0 时 hit(正则 '0/\\\\d+' 匹配 0/任何数字,不受总节点数变化影响)",
+        "expected": [
+            "00/"
+        ],
+        "roi": [
+            562,
+            1087,
+            147,
+            95
+        ],
+        "color_filter": "AutoSky_GreenCheck",
+        "post_delay": 200,
+        "timeout": 2000,
+        "action": "DoNothing"
+    },
+    "AutoSky_GreenCheck": {
+        "recognition": "ColorMatch",
+        "roi": [
+            558,
+            802,
+            157,
+            45
+        ],
+        "method": 4,
+        "lower": [
+            22,
+            123,
+            57
+        ],
+        "upper": [
+            55,
+            215,
+            102
+        ],
+        "action": "DoNothing",
+        "post_delay": 200,
+        "timeout": 2000
     },
     "AutoSky_ChangeTarget": {
         "recognition": "DirectHit",
@@ -207,12 +271,30 @@
         "post_delay": 200,
         "timeout": 1000
     },
+    "AutoSky_RiftColor": {
+        "recognition": "OCR",
+        "doc": "时空裂痕的边框颜色字（青/黄/赤/蓝）→ 对应阵营",
+        "expected": [
+            "青",
+            "黄",
+            "赤",
+            "蓝"
+        ],
+        "roi": [
+            0,
+            265,
+            184,
+            240
+        ],
+        "post_delay": 200,
+        "timeout": 1000
+    },
     "AutoSky_EventDetection": {
         "recognition": "OCR",
         "expected": [
             "探索",
             "袭击",
-            "解除"
+            "调查"
         ],
         "roi": [
             470,
@@ -222,14 +304,17 @@
         ],
         "timeout": 2000,
         "next": [
+            "AutoSky_CombatEventDestory",
             "AutoSky_ExploreEventDetection",
-            "AutoSky_CombatEventDetection",
-            "AutoSky_ActivateTemple"
+            "AutoSky_CombatEventDetection"
         ]
     },
     "AutoSky_ExploreEventDetection": {
         "recognition": "OCR",
-        "expected": "探索",
+        "expected": [
+            "调查",
+            "探索"
+        ],
         "roi": [
             470,
             203,
@@ -244,27 +329,28 @@
         "recognition": "OCR",
         "expected": "袭击",
         "roi": [
-            470,
-            203,
-            249,
-            317
+            517,
+            224,
+            196,
+            362
         ],
         "action": "Click",
         "post_delay": 3500,
         "timeout": 10000,
         "next": [
-            "AutoSky_SkipDetection",
-            "AutoSky_Lost"
+            "AutoSky_SkipDetection"
         ]
     },
     "AutoSky_ActivateTemple": {
+        "enable": false,
+        "doc": "开启神殿",
         "recognition": "OCR",
         "expected": "解除封印",
         "roi": [
-            470,
-            203,
-            249,
-            317
+            517,
+            224,
+            196,
+            362
         ],
         "action": "Click",
         "post_delay": 500,
@@ -274,13 +360,14 @@
         ]
     },
     "AutoSky_ActivateTemple_Confirm": {
+        "doc": "开启神殿确认",
         "recognition": "OCR",
         "expected": "开启",
         "roi": [
-            25,
+            35,
             427,
-            663,
-            397
+            648,
+            405
         ],
         "action": "Click",
         "post_delay": 1000,
@@ -288,6 +375,20 @@
         "next": [
             "ConfirmButton"
         ]
+    },
+    "AutoSky_CombatEventDestory": {
+        "doc": "战斗事件右侧的摧毁按钮（炮轰，不进入战斗）",
+        "recognition": "OCR",
+        "expected": "摧毁",
+        "roi": [
+            517,
+            224,
+            196,
+            362
+        ],
+        "action": "Click",
+        "post_delay": 3500,
+        "timeout": 10000
     },
     "AutoSky_SkipDetection": {
         "recognition": "OCR",
@@ -300,30 +401,70 @@
             168
         ],
         "action": "Click",
-        "post_delay": 500,
+        "post_delay": 1000,
         "timeout": 5000,
         "next": [
+            "AutoSky_CloneDied",
             "AutoSky_TroopLoss",
-            "AutoSky_CheckExplorationInfo",
-            "[JumpBack]ClickCenter_200ms"
+            "AutoSky_SkipDetection_Win",
+            "AutoSky_SkipDetection_Fail"
         ]
     },
-    "AutoSky_Lost": {
+    "AutoSky_SkipDetection_Fail": {
+        "focus": {
+            "Node.Action.Succeeded": {
+                "content": "战斗失败",
+                "display": [
+                    "log"
+                ]
+            }
+        },
         "recognition": "OCR",
-        "doc": "出现这个界面，说明遇到打不过的了要用logger给用户提示并退出任务",
-        "expected": "继续袭击",
+        "expected": "战斗结束",
         "roi": [
-            191,
-            574,
-            117,
-            42
+            121,
+            300,
+            466,
+            510
         ],
-        "post_delay": 1000,
-        "timeout": 5000
+        "action": "Click",
+        "post_delay": 500,
+        "timeout": 2000,
+        "next": [
+            "AutoSky_CheckExplorationInfo",
+            "[JumpBack]ConfirmButton_500ms",
+            "[JumpBack]ClickCenter"
+        ]
+    },
+    "AutoSky_SkipDetection_Win": {
+        "focus": {
+            "Node.Action.Succeeded": {
+                "content": "战斗胜利",
+                "display": [
+                    "log"
+                ]
+            }
+        },
+        "recognition": "OCR",
+        "expected": "战斗胜利",
+        "roi": [
+            121,
+            300,
+            466,
+            510
+        ],
+        "action": "Click",
+        "post_delay": 500,
+        "timeout": 2000,
+        "next": [
+            "AutoSky_CheckExplorationInfo",
+            "[JumpBack]ConfirmButton_500ms",
+            "[JumpBack]ClickCenter"
+        ]
     },
     "AutoSky_TroopLoss": {
         "recognition": "OCR",
-        "doc": "出现这个界面，说明克隆体死了，要用logger给用户提示并退出任务",
+        "doc": "兼容旧版克隆体战损识别，命中后取消本次战斗结算并重新挑战",
         "expected": "克隆体战损",
         "roi": [
             244,
@@ -336,7 +477,7 @@
     },
     "AutoSky_TroopLoss_Backtext": {
         "recognition": "OCR",
-        "doc": "点击退出克隆体战损界面，这个roi我设置的很大，从屏幕中间一直到最底下，因为我不知道如果死的多了这个“取消结算”按钮的位置会不会变得靠下",
+        "doc": "克隆体战损时取消本次战斗结算；roi 较大以兼容按钮位置变化",
         "expected": "取消结算",
         "roi": [
             258,
@@ -349,6 +490,20 @@
         "timeout": 1000
     },
     "AutoSky_Exit_Radar_Interface": {
+        "focus": {
+            "Node.Action.Succeeded": {
+                "content": "已经离开雷达界面",
+                "display": [
+                    "log"
+                ]
+            },
+            "Node.Action.Failed": {
+                "content": "离开雷达界面失败",
+                "display": [
+                    "log"
+                ]
+            }
+        },
         "recognition": "TemplateMatch",
         "doc": "点击这个小按钮进离开雷达界面",
         "template": "dailyTask/AutoSky_Exit_Radar_Interface.png",
@@ -359,29 +514,30 @@
             45
         ],
         "action": "Click",
-        "post_delay": 200,
+        "post_delay": 1000,
         "timeout": 2000
     },
     "AutoSky_CheckTargetNum": {
-        "doc": "检测右下角目标数",
+        "doc": "检测右下角目标数(格式 X/Y,如 14/18)。带颜色过滤,与 AutoSky_CheckNodeCountZero 共用 AutoSky_GreenCheck 提高准确度",
         "recognition": "OCR",
-        "expected": "\\d+",
+        "expected": "\\d+/\\d+",
         "roi": [
-            619,
-            1125,
-            33,
-            32
+            585,
+            1120,
+            110,
+            45
         ],
+        "color_filter": "AutoSky_GreenCheck",
         "action": "DoNothing",
         "post_delay": 200,
         "timeout": 2000
     },
-    "AutoSky_Enter_Clone": {
+    "AutoSky_Disable_Clone": {
         "next": [
-            "AutoSky_Enter_Clone_Start"
+            "AutoSky_Disable_Clone_Start"
         ]
     },
-    "AutoSky_Enter_Clone_Start": {
+    "AutoSky_Disable_Clone_Start": {
         "recognition": "TemplateMatch",
         "template": "dailyTask/AutoSky_Enter_Clone.png",
         "roi": [
@@ -394,11 +550,11 @@
         "post_delay": 1000,
         "timeout": 2000,
         "next": [
-            "AutoSky_Enter_CloneClosed",
-            "AutoSky_Enter_CloneOpened"
+            "AutoSky_Disable_CloneClosed",
+            "AutoSky_Disable_CloneOpened"
         ]
     },
-    "AutoSky_Enter_CloneClosed": {
+    "AutoSky_Disable_CloneClosed": {
         "recognition": "TemplateMatch",
         "template": "dailyTask/ClosedButton.png",
         "roi": [
@@ -414,7 +570,7 @@
             "BackText_500ms"
         ]
     },
-    "AutoSky_Enter_CloneOpened": {
+    "AutoSky_Disable_CloneOpened": {
         "recognition": "TemplateMatch",
         "template": "dailyTask/OpenButton.png",
         "roi": [
@@ -424,6 +580,60 @@
             280
         ],
         "action": "Click",
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "BackText_500ms"
+        ]
+    },
+    "AutoSky_Enable_Clone": {
+        "next": [
+            "AutoSky_Enable_Clone_Start"
+        ]
+    },
+    "AutoSky_Enable_Clone_Start": {
+        "recognition": "TemplateMatch",
+        "template": "dailyTask/AutoSky_Enter_Clone.png",
+        "roi": [
+            432,
+            1116,
+            261,
+            154
+        ],
+        "action": "Click",
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "AutoSky_Enable_CloneClosed",
+            "AutoSky_Enable_CloneOpened"
+        ]
+    },
+    "AutoSky_Enable_CloneClosed": {
+        "recognition": "TemplateMatch",
+        "template": "dailyTask/ClosedButton.png",
+        "roi": [
+            432,
+            746,
+            228,
+            280
+        ],
+        "action": "Click",
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "BackText_500ms"
+        ]
+    },
+    "AutoSky_Enable_CloneOpened": {
+        "recognition": "TemplateMatch",
+        "template": "dailyTask/OpenButton.png",
+        "roi": [
+            432,
+            746,
+            228,
+            280
+        ],
+        "action": "DoNothing",
         "post_delay": 1000,
         "timeout": 2000,
         "next": [
@@ -482,7 +692,7 @@
             99
         ],
         "action": "Click",
-        "post_delay": 500,
+        "post_delay": 1000,
         "timeout": 2000
     },
     "AutoSky_Click_ReturnIcon": {
@@ -622,7 +832,8 @@
     "AutoSky_CheckRandomEvent": {
         "recognition": "OCR",
         "expected": [
-            "[^\\x00-\\x7F]+"
+            "[^\\x00-\\x7F]+",
+            "[A-Za-z][A-Za-z0-9 _]*"
         ],
         "roi": [
             0,
@@ -658,12 +869,23 @@
         "post_delay": 500,
         "timeout": 2000
     },
-    "AutoSky_ClickOptionByName": {
-        "doc": "按事件库推荐选项名点击（运行时由 Python 通过 pipeline_override 注入 expected）",
+    "AutoSky_TalkEvent": {
         "recognition": "OCR",
-        "expected": [
-            "_PLACEHOLDER_"
+        "doc": "交谈类事件（暂不处理,仅识别后跳过）",
+        "expected": "交谈",
+        "roi": [
+            470,
+            203,
+            249,
+            317
         ],
+        "post_delay": 0,
+        "timeout": 1000
+    },
+    "AutoSky_RobberyBattleEntry": {
+        "recognition": "OCR",
+        "doc": "商店勒索后对方生气,点进入战斗 → 自动接战斗+跳过流程",
+        "expected": "进入战斗",
         "roi": [
             40,
             380,
@@ -671,7 +893,130 @@
             780
         ],
         "action": "Click",
+        "post_delay": 1500,
+        "timeout": 3000,
+        "next": [
+            "AutoSky_SkipDetection"
+        ]
+    },
+    "AutoSky_ClickOptionByName": {
+        "doc": "按事件库推荐选项名点击（运行时由 Python 通过 pipeline_override 注入 expected）",
+        "recognition": "OCR",
+        "expected": [
+            "_PLACEHOLDER_"
+        ],
+        "replace": [
+            [
+                "翻羽找",
+                "翻找"
+            ]
+        ],
+        "roi": [
+            40,
+            380,
+            640,
+            780
+        ],
+        "index": -1,
+        "action": "Click",
+        "order_by": "Vertical",
         "post_delay": 500,
         "timeout": 3000
+    },
+    "AutoSky_BagConfig": {
+        "recognition": "OCR",
+        "doc": "能量包使用数量(0=不使用)。selected 数量由 interface.json '能量包使用模式' 选项的 pipeline_override.expected 注入。",
+        "expected": [
+            "0"
+        ],
+        "roi": [
+            0,
+            0,
+            1,
+            1
+        ],
+        "action": "DoNothing",
+        "post_delay": 0,
+        "timeout": 100
+    },
+    "AutoSky_CloneConfig": {
+        "enable": false
+    },
+    "AutoSky_CloneDied": {
+        "recognition": "OCR",
+        "doc": "检测战斗结算时是否出现克隆体战损",
+        "roi": [
+            192,
+            318,
+            319,
+            196
+        ],
+        "expected": "战损",
+        "action": "DoNothing",
+        "post_delay": 200,
+        "timeout": 2000,
+        "next": [
+            "AutoSky_CloneDied_Cancel"
+        ]
+    },
+    "AutoSky_CloneDied_Cancel": {
+        "focus": {
+            "Node.Action.Succeeded": {
+                "content": "识别到克隆体战损，已取消本次战斗结算，准备重新挑战",
+                "display": [
+                    "log"
+                ]
+            }
+        },
+        "recognition": "OCR",
+        "doc": "克隆体战损时取消本次战斗结算",
+        "roi": [
+            139,
+            551,
+            446,
+            419
+        ],
+        "expected": "取消结算",
+        "action": "Click",
+        "order_by": "Vertical",
+        "index": -1,
+        "post_delay": 500,
+        "timeout": 2000,
+        "next": [
+            "AutoSky_CheckExplorationInfo",
+            "[JumpBack]ClickCenter"
+        ]
+    },
+    "AutoSky_CheckSkyLevel": {
+        "next": [
+            "AutoSky_CheckSkyLevel_Check",
+            "[JumpBack]AutoSky_CheckSkyLevel_Click"
+        ]
+    },
+    "AutoSky_CheckSkyLevel_Click": {
+        "recognition": "OCR",
+        "expected": "探索信息",
+        "roi": [
+            0,
+            634,
+            256,
+            169
+        ],
+        "action": "Click",
+        "post_delay": 500,
+        "timeout": 2000
+    },
+    "AutoSky_CheckSkyLevel_Check": {
+        "recognition": "OCR",
+        "expected": "\\d+",
+        "roi": [
+            399,
+            572,
+            100,
+            69
+        ],
+        "action": "DoNothing",
+        "post_delay": 500,
+        "timeout": 2000
     }
 }

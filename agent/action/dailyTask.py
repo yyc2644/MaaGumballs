@@ -76,7 +76,7 @@ class DailyTask(CustomAction):
 @AgentServer.custom_action("WeeklyRaidFighting")
 class WeeklyRaidFighting(CustomAction):
     def __init__(self):
-        self.weeklyRaidList = ["永恒王座", "六重天"]
+        self.weeklyRaidList = ["永恒王座", "六重天","惑星走私集团"]
         super().__init__()
         # 这个做成一个map，通过我们的副本名称一个string来映射一个string列表
         self.MonsterCheckPath: str = "dailyTask/weeklyRaid/"
@@ -98,9 +98,19 @@ class WeeklyRaidFighting(CustomAction):
             self.MonsterCheckPath + "六重天冈布奥6.png",
             self.MonsterCheckPath + "六重天冈布奥7.png",
         ]
+        self.MonsterList3 = [
+            self.MonsterCheckPath + "惑星走私集团1.png",
+            self.MonsterCheckPath + "惑星走私集团2.png",
+            self.MonsterCheckPath + "惑星走私集团3.png",
+            self.MonsterCheckPath + "惑星走私集团4.png",
+            self.MonsterCheckPath + "惑星走私集团5.png",
+            self.MonsterCheckPath + "惑星走私集团6.png",
+            self.MonsterCheckPath + "惑星走私集团7.png",
+        ]
         self.MonsterMap = {
             "永恒王座": self.MonsterList1,
             "六重天": self.MonsterList2,
+            "惑星走私集团": self.MonsterList3
         }
 
     def run(
@@ -113,15 +123,23 @@ class WeeklyRaidFighting(CustomAction):
             "WeeklyRaid_Check",
             context.tasker.controller.post_screencap().wait().get(),
         ):
-            if recoDetail.best_result.text in self.weeklyRaidList:
+            if recoDetail.hit and recoDetail.best_result and \
+               recoDetail.best_result.text in self.weeklyRaidList:
                 taskName = recoDetail.best_result.text
                 logger.info(f"检测到周赛战斗为: {taskName}")
+            else:
+                logger.warning("未检测到周赛战斗(命中失败或文本不在列表)")
+                return CustomAction.RunResult(success=False)
         else:
             logger.warning("未检测到周赛战斗")
             return CustomAction.RunResult(success=False)
 
         # 2. 执行战斗, 一共6~7轮
         for i in range(12):
+            if context.tasker.stopping:
+                logger.info("检测到停止任务, 开始退出agent")
+                return CustomAction.RunResult(success=False)
+
             logger.info(f"第{i+1}/12轮识别怪物")
             if MonsterReco := context.run_recognition(
                 "WeeklyRaid_MonsterCheck",
@@ -181,7 +199,6 @@ class DailyForeignDomain_Explore(CustomAction):
 
     def __init__(self):
         super().__init__()
-        self.planets = ["X", "U", "E", "G"]
         self.FDUtils = foreignDomainUtils(self)
 
     def run(
@@ -197,17 +214,18 @@ class DailyForeignDomain_Explore(CustomAction):
 
         # 移动到地图右下角开始
         self.FDUtils.swipeMapToBottomRight(context)
+        planets = ["X", "U", "E", "G"]
         default_fleets = ["奥鲁维", "卡纳斯", "游荡者", "深渊"]
 
         time.sleep(2)
-        while len(self.planets) > 0:
+        while len(planets) > 0:
             if context.tasker.stopping:
                 logger.info("检测到停止任务, 开始退出agent")
                 return CustomAction.RunResult(success=False)
 
             remove_list = []
-            for i in range(0, len(self.planets)):
-                key = self.planets[i]
+            for i in range(0, len(planets)):
+                key = planets[i]
                 img = context.tasker.controller.post_screencap().wait().get()
                 recoDetail = context.run_recognition(
                     "FD_FindPlanet",
@@ -239,10 +257,10 @@ class DailyForeignDomain_Explore(CustomAction):
                     default_fleets.pop(0)
                     remove_list.append(key)
 
-            if i == len(self.planets) - 1:
+            if i == len(planets) - 1:
                 self.FDUtils.swipeMap(context)
             for key in remove_list:
-                self.planets.remove(key)
+                planets.remove(key)
         logger.info("所有星球已全部找到")
         for key in self.FDUtils.fleetRoiList:
             box = self.FDUtils.fleetRoiList[key]
