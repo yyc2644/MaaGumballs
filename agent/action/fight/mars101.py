@@ -243,7 +243,7 @@ class Mars101(CustomAction):
                         },
                     )
                     self.is_android_skill_enabled = True
-        context.run_task("Fight_ReturnMainWindow")
+            context.run_task("Fight_ReturnMainWindow")
         return True
 
     def handle_boss_event(self, context: Context):

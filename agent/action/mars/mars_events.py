@@ -181,9 +181,8 @@ class MarsEventDispatcher:
         if self.mars.layers >= 30 and self.mars.layers % 10 == 0:
             return True
 
-        if bodyRecoDetail := context.run_recognition("Mars_Body", image):
-            if not bodyRecoDetail.hit:
-                return True
+        bodyRecoDetail = context.run_recognition("Mars_Body", image)
+        if bodyRecoDetail and bodyRecoDetail.hit:
 
             logger.info("触发Mars摸金事件")
             for body in bodyRecoDetail.filtered_results:

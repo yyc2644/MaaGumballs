@@ -56,6 +56,10 @@ class MarsBossHandler:
             fightUtils.cast_magic("土", "石肤术", context, (boss_x, boss_y))
         fightUtils.cast_magic_special("生命颂歌", context)
 
+        def click_boss():
+            context.tasker.controller.post_click(boss_x, boss_y).wait()
+            return True
+
         actions = []
         if self.mars.target_magicgumball_para == "波塞冬":
             if self.mars.layers < 110:
@@ -63,31 +67,31 @@ class MarsBossHandler:
                     lambda: fightUtils.cast_magic(
                         "水", "冰锥术", context, (boss_x, boss_y)
                     ),
-                    lambda: context.tasker.controller.post_click(boss_x, boss_y).wait(),
+                    click_boss,
                 ]
             elif self.mars.layers >= 110 and self.mars.layers <= 150:
                 actions = [
-                    lambda: context.tasker.controller.post_click(boss_x, boss_y).wait(),
+                    click_boss,
                     lambda: fightUtils.cast_magic(
                         "水", "冰锥术", context, (boss_x, boss_y)
                     ),
-                    lambda: context.tasker.controller.post_click(boss_x, boss_y).wait(),
-                    lambda: context.tasker.controller.post_click(boss_x, boss_y).wait(),
+                    click_boss,
+                    click_boss,
                 ]
         else:
             if self.mars.layers <= 80:
                 actions = [
-                    lambda: context.tasker.controller.post_click(boss_x, boss_y).wait(),
-                    lambda: context.tasker.controller.post_click(boss_x, boss_y).wait(),
-                    lambda: context.tasker.controller.post_click(boss_x, boss_y).wait(),
+                    click_boss,
+                    click_boss,
+                    click_boss,
                 ]
             elif self.mars.layers >= 90 and self.mars.layers <= 150:
                 actions = [
-                    lambda: context.tasker.controller.post_click(boss_x, boss_y).wait(),
-                    lambda: context.tasker.controller.post_click(boss_x, boss_y).wait(),
+                    click_boss,
+                    click_boss,
                     lambda: fightUtils.cast_magic("水", "冰锥术", context),
-                    lambda: context.tasker.controller.post_click(boss_x, boss_y).wait(),
-                    lambda: context.tasker.controller.post_click(boss_x, boss_y).wait(),
+                    click_boss,
+                    click_boss,
                 ]
         index = 0
         for _ in range(10):
