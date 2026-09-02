@@ -360,6 +360,67 @@
             ]
         },
         {
+            "name": "卡牌幻境",
+            "entry": "Card",
+            "repeatable": true,
+            "repeat_count": 1,
+            "option": [
+                "自动肉鸽时使用钻石购买体力",
+                "卡牌目标层数",
+                "卡牌结算方式"
+            ],
+            "pipeline_override": {
+                "Select_WorldTree_InputBox_Text": {
+                    "input_text": "封印师"
+                },
+                "select_InputBox_Text1": {
+                    "input_text": "浴血战士"
+                },
+                "select_InputBox_Text2": {
+                    "input_text": "梦魇之子"
+                }
+            },
+            "doc": [
+                "## 卡牌幻境长线自动化",
+                "- 默认阵容：封印师 + 浴血战士 + 梦魇之子",
+                "- 小怪层使用冥想/四象封印并交给通用清层器兜底",
+                "- Boss层执行连斩、冥想、龙心、瓦解、四象和斩杀流程",
+                "- 使用OCR处理安全事件、圆桌会议、神龙与卷轴商店，不依赖Card专属模板图",
+                "- 精确清完配置目标层后才结算；同层连续卡住会暂离保存恢复",
+                "- 神秘洞穴验证仍需玩家本人完成，脚本会保存状态并等待"
+            ]
+        },
+        {
+            "name": "沉眠小镇",
+            "entry": "Sleeptown",
+            "repeatable": true,
+            "repeat_count": 1,
+            "option": [
+                "自动肉鸽时使用钻石购买体力",
+                "沉眠小镇目标层数",
+                "沉眠小镇结算方式"
+            ],
+            "pipeline_override": {
+                "Sleeptown_Select": {
+                    "custom_action_param": {
+                        "drug_name": "彗星秘药",
+                        "artifact_template": "fight/Artifact/梗图收藏柜.png",
+                        "gumball_1": "福神",
+                        "gumball_2": "寄生体"
+                    }
+                }
+            },
+            "doc": [
+                "## 沉眠小镇长线自动化",
+                "- 自动从大地图寻找沉眠小镇并选择无尽模式",
+                "- 默认神器：梗图收藏柜",
+                "- 默认药剂：彗星秘药",
+                "- 默认灵魂链接：福神 + 寄生体",
+                "- 默认目标：完整清理 1201 层后自动结算",
+                "- 搜索药剂和链接冈布奥均使用文本输入，不依赖数量或强化等级"
+            ]
+        },
+        {
             "name": "神锻系列",
             "entry": "DivineForgeLand_Start",
             "option": [
@@ -1102,6 +1163,140 @@
                     "pipeline_override": {
                         "Mars_Astrological_Title_Setting": {
                             "expected": "true"
+                        }
+                    }
+                }
+            ]
+        },
+        "卡牌目标层数": {
+            "default_case": "1201",
+            "type": "select",
+            "cases": [
+                {
+                    "name": "95",
+                    "pipeline_override": {
+                        "Card_Target_Layer_Setting": {
+                            "expected": "95"
+                        }
+                    }
+                },
+                {
+                    "name": "101",
+                    "pipeline_override": {
+                        "Card_Target_Layer_Setting": {
+                            "expected": "101"
+                        }
+                    }
+                },
+                {
+                    "name": "201",
+                    "pipeline_override": {
+                        "Card_Target_Layer_Setting": {
+                            "expected": "201"
+                        }
+                    }
+                },
+                {
+                    "name": "601",
+                    "pipeline_override": {
+                        "Card_Target_Layer_Setting": {
+                            "expected": "601"
+                        }
+                    }
+                },
+                {
+                    "name": "1201",
+                    "pipeline_override": {
+                        "Card_Target_Layer_Setting": {
+                            "expected": "1201"
+                        }
+                    }
+                }
+            ]
+        },
+        "卡牌结算方式": {
+            "default_case": "自动结算",
+            "cases": [
+                {
+                    "name": "自动结算",
+                    "pipeline_override": {
+                        "Card_ManualLeave_Setting": {
+                            "expected": "自动结算"
+                        }
+                    }
+                },
+                {
+                    "name": "保存暂离",
+                    "pipeline_override": {
+                        "Card_ManualLeave_Setting": {
+                            "expected": "保存暂离"
+                        }
+                    }
+                }
+            ]
+        },
+        "沉眠小镇目标层数": {
+            "default_case": "1201",
+            "type": "select",
+            "cases": [
+                {
+                    "name": "95",
+                    "pipeline_override": {
+                        "Sleeptown_Target_Layer_Setting": {
+                            "expected": "95"
+                        }
+                    }
+                },
+                {
+                    "name": "101",
+                    "pipeline_override": {
+                        "Sleeptown_Target_Layer_Setting": {
+                            "expected": "101"
+                        }
+                    }
+                },
+                {
+                    "name": "201",
+                    "pipeline_override": {
+                        "Sleeptown_Target_Layer_Setting": {
+                            "expected": "201"
+                        }
+                    }
+                },
+                {
+                    "name": "601",
+                    "pipeline_override": {
+                        "Sleeptown_Target_Layer_Setting": {
+                            "expected": "601"
+                        }
+                    }
+                },
+                {
+                    "name": "1201",
+                    "pipeline_override": {
+                        "Sleeptown_Target_Layer_Setting": {
+                            "expected": "1201"
+                        }
+                    }
+                }
+            ]
+        },
+        "沉眠小镇结算方式": {
+            "default_case": "自动结算",
+            "cases": [
+                {
+                    "name": "自动结算",
+                    "pipeline_override": {
+                        "Sleeptown_ManualLeave_Setting": {
+                            "expected": "自动结算"
+                        }
+                    }
+                },
+                {
+                    "name": "保存暂离",
+                    "pipeline_override": {
+                        "Sleeptown_ManualLeave_Setting": {
+                            "expected": "保存暂离"
                         }
                     }
                 }

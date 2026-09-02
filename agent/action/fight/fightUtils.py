@@ -34,6 +34,157 @@ EquipmentType: dict = {
 }
 
 
+def normalize_ocr_text(text: str) -> str:
+    """Normalize punctuation and common traditional-Chinese OCR variants."""
+    if text is None:
+        return ""
+    normalized = str(text).strip().rstrip("！!。。，,")
+    replacements = {
+        "圓": "圆",
+        "會": "会",
+        "議": "议",
+        "類": "类",
+        "傷": "伤",
+        "擊": "击",
+        "電": "电",
+        "靜": "静",
+        "場": "场",
+        "喚": "唤",
+        "獲": "获",
+        "學": "学",
+        "習": "习",
+        "龍": "龙",
+        "語": "语",
+        "內": "内",
+        "軍": "军",
+    }
+    for old, new in replacements.items():
+        normalized = normalized.replace(old, new)
+    return normalized
+
+
+def ocr_text_candidates(context: Context, expected, roi=None, image=None):
+    """Return all OCR candidates from a temporary TextReco override."""
+    if image is None:
+        image = context.tasker.controller.post_screencap().wait().get()
+    override = {
+        "TextReco": {
+            "recognition": "OCR",
+            "expected": expected,
+            "action": "DoNothing",
+        }
+    }
+    if roi is not None:
+        override["TextReco"]["roi"] = roi
+    detail = context.run_recognition("TextReco", image, pipeline_override=override)
+    if not detail or not detail.hit:
+        return []
+    candidates = getattr(detail, "filtered_results", None)
+    if candidates:
+        return list(candidates)
+    best_result = getattr(detail, "best_result", None)
+    return [best_result] if best_result else []
+
+
+def click_text_by_priority(
+    context: Context,
+    priorities,
+    expected=None,
+    roi=None,
+    image=None,
+    desc="文本选项",
+    return_text=False,
+):
+    """Click an OCR result using substring-based priority matching."""
+    if expected is None:
+        expected = priorities
+    candidates = ocr_text_candidates(context, expected, roi=roi, image=image)
+    best_index = len(priorities) + 1
+    best_result = None
+    best_text = ""
+    for result in candidates:
+        text = normalize_ocr_text(getattr(result, "text", ""))
+        for index, priority in enumerate(priorities):
+            priority_text = normalize_ocr_text(priority)
+            if priority_text and priority_text in text and index < best_index:
+                best_index = index
+                best_result = result
+                best_text = text
+                break
+    if best_result is None:
+        logger.debug(f"没有找到{desc}可点击项，优先级: {priorities}")
+        return False
+
+    box = best_result.box
+    center_x = box[0] + box[2] // 2
+    center_y = box[1] + box[3] // 2
+    logger.info(f"点击{desc}: {best_text}, 优先级: {best_index}")
+    context.tasker.controller.post_click(center_x, center_y).wait()
+    return best_text if return_text else True
+
+
+def handle_arthur_round_table_event(
+    context: Context,
+    topic_priorities,
+    type_priorities=None,
+):
+    """Handle Arthur's round table without requiring event templates."""
+    if type_priorities is None:
+        type_priorities = ["宗教类", "宗教", "内政类", "内政", "军事类", "军事"]
+
+    image = context.tasker.controller.post_screencap().wait().get()
+    entry = ocr_text_candidates(
+        context, ["会议圆桌", "圆桌会议", "圆桌"], roi=[0, 180, 720, 850], image=image
+    )
+    meeting_type = ocr_text_candidates(
+        context,
+        ["宗教", "内政", "军事", "税收", "农业", "刑法"],
+        roi=[45, 190, 630, 850],
+        image=image,
+    )
+    topic = ocr_text_candidates(
+        context, topic_priorities, roi=[35, 180, 650, 900], image=image
+    )
+    # A magic-selection screen can also contain topic words such as 闪电术.
+    # Require round-table entry/type evidence to avoid casting or clicking it.
+    if not (entry or meeting_type):
+        return False
+
+    logger.info("检测到亚瑟王圆桌会议，开始按优先级处理")
+    if entry:
+        click_text_by_priority(
+            context,
+            ["会议圆桌", "圆桌会议", "圆桌"],
+            roi=[0, 180, 720, 850],
+            image=image,
+            desc="亚瑟王圆桌入口",
+        )
+        time.sleep(1)
+    click_text_by_priority(
+        context,
+        type_priorities,
+        expected=["宗教", "内政", "军事", "税收", "农业", "刑法"],
+        roi=[45, 190, 630, 850],
+        desc="亚瑟王会议类型",
+    )
+    time.sleep(1)
+    selected = click_text_by_priority(
+        context,
+        topic_priorities,
+        expected=topic_priorities,
+        roi=[35, 180, 650, 900],
+        desc="亚瑟王会议议题",
+    )
+    time.sleep(1)
+    click_text_by_priority(
+        context,
+        ["确定", "确认", "通过", "赞成", "同意"],
+        roi=[80, 780, 560, 300],
+        desc="亚瑟王会议确认",
+    )
+    return selected or True
+
+
 def send_alert(title, message):
     try:
         notification.notify(
@@ -820,6 +971,20 @@ def dragonwish(targetWish: str, context: Context):
             "我要变得更强",
             "我要神奇的果实",
         ]
+    elif targetWish == "卡牌幻境":
+        wishlist = [
+            "我想学习龙语魔法",
+            "我想获得巨龙之力",
+            "我要获得钻石",
+            "我需要您的碎片",
+            "我要神奇的果实",
+            "我要更多的伙伴",
+            "我要变得富有",
+            "我要大量的矿石",
+            "我要最凶残的装备",
+            "我要变得更强",
+            "我要你的收藏品",
+        ]
     elif targetWish == "测试":
         wishlist = [
             "我要变得富有",
@@ -835,24 +1000,45 @@ def dragonwish(targetWish: str, context: Context):
             "我想获得巨龙之力",
         ]
     else:
-        logger.error("请输入[工资, 马尔斯, 测试]中的一个")
+        logger.error("请输入[工资, 马尔斯, 卡牌幻境, 测试]中的一个")
+        return False
     # 神龙许愿list = ["我要获得钻石", "我要神奇的果实", "我想获得巨龙之力", "我要学习龙语魔法", "我要变得更强","我要最凶残的装备", "我要变得富有", "我要大量的矿石", "我要你的收藏品", "我要您的碎片", "我要更多的伙伴"]
 
     # # 等待8秒，确保界面加载完毕，可以考虑移除
     time.sleep(3)
     context.tasker.controller.post_click(640, 360).wait()
     time.sleep(3)
-    textdetail = context.run_task("Fight_FindDragonText")
-    if textdetail.nodes:
-        for result in textdetail.nodes[0].recognition.filtered_results:
-            if result.text.endswith("！") or result.text.endswith("!"):
-                result.text = result.text[:-1]
-            cuurent_wish_index = wishlist.index(result.text)
-            logger.info(f"当前许愿: {result.text}, 当前许愿索引: {cuurent_wish_index}")
+    textdetail = None
+    for attempt in range(3):
+        textdetail = context.run_task("Fight_FindDragonText")
+        if textdetail and textdetail.nodes:
+            break
+        logger.warning(f"神龙愿望OCR为空，第{attempt + 1}/3次重试")
+        time.sleep(1)
+    if textdetail and textdetail.nodes:
+        recognition = getattr(textdetail.nodes[0], "recognition", None)
+        results = getattr(recognition, "filtered_results", None) or []
+        for result in results:
+            wish_text = normalize_ocr_text(result.text)
+            wish_alias = {
+                "我要学习龙语魔法": "我想学习龙语魔法",
+                "我要获得巨龙之力": "我想获得巨龙之力",
+                "我要您的碎片": "我需要您的碎片",
+            }
+            wish_text = wish_alias.get(wish_text, wish_text)
+            if wish_text not in wishlist:
+                logger.debug(f"当前许愿不在优先级列表中，跳过: {wish_text}")
+                continue
+            cuurent_wish_index = wishlist.index(wish_text)
+            logger.info(f"当前许愿: {wish_text}, 当前许愿索引: {cuurent_wish_index}")
             if cuurent_wish_index < min_index:
                 min_index = cuurent_wish_index
-                min_index_wish = result.text
+                min_index_wish = wish_text
                 min_index_wish_pos = result.box
+        if min_index_wish_pos is None:
+            logger.warning("神龙愿望OCR有结果，但没有匹配到可安全选择的愿望")
+            context.run_task("Fight_ReturnMainWindow")
+            return False
         if min_index_wish_pos:
             center_x, center_y = (
                 min_index_wish_pos[0] + min_index_wish_pos[2] // 2,
@@ -863,10 +1049,9 @@ def dragonwish(targetWish: str, context: Context):
         time.sleep(3)
 
         logger.info(f"已点击愿望: {min_index_wish}, 愿望索引: {min_index}")
-        status = True
-        while status:
+        for dialog_attempt in range(30):
             image = context.tasker.controller.post_screencap().wait().get()
-            TextRecoDetail = context.run_recognition(
+            text_reco_detail = context.run_recognition(
                 "TextReco",
                 image,
                 pipeline_override={
@@ -878,17 +1063,21 @@ def dragonwish(targetWish: str, context: Context):
                     },
                 },
             )
-            status = TextRecoDetail.hit
-            if TextRecoDetail.hit:
-                center_x, center_y = (
-                    TextRecoDetail.box[0] + TextRecoDetail.box[2] // 2,
-                    TextRecoDetail.box[1] + TextRecoDetail.box[3] // 2 + 10,
-                )
-                context.tasker.controller.post_click(center_x, center_y).wait()
-                logger.debug(
-                    f"识别到神龙或冈布奥, 已点击{(center_x, center_y)}, 识别范围为{TextRecoDetail.best_result.box}"
-                )
-                time.sleep(1)
+            if not text_reco_detail or not text_reco_detail.hit:
+                break
+            center_x, center_y = (
+                text_reco_detail.box[0] + text_reco_detail.box[2] // 2,
+                text_reco_detail.box[1] + text_reco_detail.box[3] // 2 + 10,
+            )
+            context.tasker.controller.post_click(center_x, center_y).wait()
+            logger.debug(
+                f"识别到神龙或冈布奥, 已点击{(center_x, center_y)}, "
+                f"识别范围为{getattr(text_reco_detail, 'box', None)}"
+            )
+            time.sleep(1)
+        else:
+            logger.warning("神龙对话连续30次仍未结束，返回主界面避免无限循环")
+            context.run_task("Fight_ReturnMainWindow")
         # 已点击愿望，等待界面加载
         if min_index_wish in [
             "我要你的收藏品",
@@ -1141,9 +1330,9 @@ def handle_dragon_event(map_str: str, context: Context):
     if context.run_recognition("Fight_FindDragonV2", img).hit:
         logger.info("是神龙,俺,俺们有救了！！！")
         logger.info(f"当前:{map_str}")
-        dragonwish(map_str, context)
+        selected_wish = dragonwish(map_str, context)
         logger.info("神龙带肥家lo~")
-        return True
+        return selected_wish or False
     return False
 
 

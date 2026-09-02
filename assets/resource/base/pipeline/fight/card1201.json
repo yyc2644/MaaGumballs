@@ -1,0 +1,104 @@
+{
+    "Card": {
+        "next": [
+            "Card_Start",
+            "Card_Fighting",
+            "[JumpBack]AlchemyReward",
+            "[JumpBack]MapIsTop",
+            "[JumpBack]MapSwipeDownToUp"
+        ]
+    },
+    "Card1201": {
+        "next": [
+            "Card_Start",
+            "Card_Fighting",
+            "[JumpBack]AlchemyReward",
+            "[JumpBack]MapIsTop",
+            "[JumpBack]MapSwipeDownToUp"
+        ]
+    },
+    "Card_Start": {
+        "recognition": "TemplateMatch",
+        "template": "fight/Card/Card_Entry.png",
+        "roi": [
+            15,
+            161,
+            691,
+            878
+        ],
+        "threshold": 0.8,
+        "action": "Custom",
+        "custom_action": "Fight_PreWar",
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "Card_Select",
+            "[JumpBack]PowerLack",
+            "[JumpBack]Select_MainWindow",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]ClickCenterBelow_500ms"
+        ]
+    },
+    "Card_Select": {
+        "recognition": "OCR",
+        "expected": "进入迷宫",
+        "roi": [
+            165,
+            871,
+            418,
+            91
+        ],
+        "action": "Custom",
+        "custom_action": "Fight_Select",
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "Card_EntryMaze"
+        ]
+    },
+    "Card_EntryMaze": {
+        "recognition": "OCR",
+        "expected": "进入迷宫",
+        "roi": [
+            165,
+            871,
+            418,
+            91
+        ],
+        "action": "Click",
+        "next": [
+            "Card_Fighting",
+            "[JumpBack]GameLoading"
+        ]
+    },
+    "Card_Fighting": {
+        "recognition": "TemplateMatch",
+        "template": "fight/UniversalUI/MazePackage.png",
+        "action": "Custom",
+        "custom_action": "Card1201",
+        "roi": [
+            47,
+            1147,
+            136,
+            117
+        ]
+    },
+    "Card_Fight_ClearCurrentLayer": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "Card_Fight_ClearCurrentLayer",
+        "custom_action_param": {
+            "layers": 1
+        },
+        "post_delay": 300,
+        "timeout": 1000
+    },
+    "Card_Target_Layer_Setting": {
+        "recognition": "OCR",
+        "expected": "1201"
+    },
+    "Card_ManualLeave_Setting": {
+        "recognition": "OCR",
+        "expected": "自动结算"
+    }
+}

@@ -8,6 +8,7 @@ from action.fight import fightProcessor
 from action.fight.fightUtils import timing_decorator
 from action.fight.downstair import FightDownstairManager
 
+import json
 import time
 
 boss_x, boss_y = 360, 800
@@ -598,27 +599,87 @@ class Fight_Select(CustomAction):
         argv: CustomAction.RunArg,
     ) -> CustomAction.RunResult:
         logger.info("选择药剂中")
-        context.run_task("Select_Drug")
+        params = {}
+        if argv.custom_action_param:
+            try:
+                params = json.loads(argv.custom_action_param)
+            except (TypeError, ValueError, json.JSONDecodeError):
+                logger.warning("解析战前选择参数失败，沿用图片识别选择药剂")
+                params = {}
+
+        drug_name = params.get("drug_name")
+        artifact_template = params.get("artifact_template")
+        gumball_1 = params.get("gumball_1")
+        gumball_2 = params.get("gumball_2")
+
+        if drug_name:
+            logger.info(f"通过文本搜索选择药剂：{drug_name}")
+            drug_result = context.run_task(
+                "Select_Drug_ByText",
+                pipeline_override={
+                    "Select_Drug_Search_InputText": {"input_text": str(drug_name)}
+                },
+            )
+        else:
+            drug_result = context.run_task("Select_Drug")
+        if not drug_result or not drug_result.nodes:
+            logger.error("选择药剂失败，停止后续战前配置")
+            return CustomAction.RunResult(success=False)
 
         logger.info("选择神器中")
-        context.run_task("Select_Artifact")
+        if artifact_template:
+            context.run_task(
+                "Select_Artifact",
+                pipeline_override={
+                    "Select_Artifact_Next": {
+                        "template": str(artifact_template)
+                    }
+                },
+            )
+        else:
+            context.run_task("Select_Artifact")
 
         logger.info("选择链接角色1")
+        gumball_1_override = {
+            "select_InputBox_Click": {"next": "select_InputBox_Text1"}
+        }
+        if gumball_1:
+            gumball_1_override["select_InputBox_Text1"] = {
+                "input_text": str(gumball_1),
+                "next": "select_InputBox_SubmitByEnter",
+            }
         context.run_task(
             "Select_Gumball_1",
-            pipeline_override={
-                "select_InputBox_Click": {"next": "select_InputBox_Text1"}
-            },
+            pipeline_override=gumball_1_override,
         )
 
         logger.info("选择链接角色2")
+        gumball_2_override = {
+            "select_InputBox_Click": {"next": "select_InputBox_Text2"}
+        }
+        if gumball_2:
+            gumball_2_override["select_InputBox_Text2"] = {
+                "input_text": str(gumball_2),
+                "next": "select_InputBox_SubmitByEnter",
+            }
         context.run_task(
             "Select_Gumball_2",
-            pipeline_override={
-                "select_InputBox_Click": {"next": "select_InputBox_Text2"}
-            },
+            pipeline_override=gumball_2_override,
         )
 
+        return CustomAction.RunResult(success=True)
+
+
+@AgentServer.custom_action("Fight_PressEnter")
+class Fight_PressEnter(CustomAction):
+    """提交需要通过输入法 Enter/Search 键触发的文本搜索。"""
+
+    def run(
+        self,
+        context: Context,
+        argv: CustomAction.RunArg,
+    ) -> CustomAction.RunResult:
+        context.tasker.controller.post_press_key(66).wait()
         return CustomAction.RunResult(success=True)
 
 

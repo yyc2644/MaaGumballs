@@ -27,13 +27,17 @@ class FightDownstairManager:
         attempts = 0
         current_layer = old_layer
 
+        if old_layer <= 0:
+            logger.warning("下楼前层数无效，不能据此判断层数变化")
+            return False, current_layer, attempts
+
         with fightUtils.timing_section("post.downstair.wait_change_total"):
             for _ in range(DOWNSTAIR_LAYER_CHANGE_MAX_ATTEMPTS):
                 attempts += 1
                 with fightUtils.timing_section("post.downstair.wait_change_iter"):
                     with fightUtils.timing_section("post.downstair.layer_after"):
                         current_layer = fightUtils.handle_currentlayer_event(context)
-                if old_layer != current_layer and current_layer != -1:
+                if current_layer > 0 and old_layer != current_layer:
                     return True, current_layer, attempts
                 with fightUtils.timing_section("post.downstair.wait_change_sleep"):
                     time.sleep(DOWNSTAIR_LAYER_CHANGE_SLEEP_SECONDS)
@@ -71,6 +75,16 @@ class FightDownstairManager:
         wait_attempts = 0
 
         temp_layer = fightUtils.handle_currentlayer_event(context)
+        if temp_layer <= 0:
+            cached_layer = int(getattr(self.mars, "layers", -1))
+            if cached_layer > 0:
+                logger.warning(
+                    f"下楼前OCR层数失败，使用状态机缓存层数{cached_layer}"
+                )
+                temp_layer = cached_layer
+            else:
+                logger.error("下楼前无法获得有效层数，本轮不点击楼梯")
+                return False
 
         door_target = self.processor.get_last_door_click_target(temp_layer)
         clicked_door = self._click_door_target(context, door_target)
@@ -131,9 +145,9 @@ class FightDownstairManager:
             )
             return True
 
-        logger.info("由于未知原因, 层数未改变，可能在夹层中")
-        downstair_result = "no_change_but_continue"
+        logger.info("点击楼梯后层数未改变，本轮返回失败并重新识别")
+        downstair_result = "no_change_retry"
         logger.debug(
             f"[downstair_result] result={downstair_result} old_layer={temp_layer} new_layer={current_layer} attempts={wait_attempts} branch={downstair_branch}"
         )
-        return True
+        return False
