@@ -9,8 +9,8 @@ from action.fight import fightUtils
 import time
 
 DOWNSTAIR_LAYER_CHANGE_MAX_ATTEMPTS = 5
-DOWNSTAIR_LAYER_CHANGE_SLEEP_SECONDS = 1
-KEYHOLE_POLL_SECONDS = 3
+DOWNSTAIR_LAYER_CHANGE_SLEEP_SECONDS = 0.6
+KEYHOLE_POLL_SECONDS = 2
 
 if TYPE_CHECKING:
     from action.fight.mars101 import Mars101
@@ -57,7 +57,7 @@ class FightDownstairManager:
         context.run_task(
             "WaitStableNode_ForOverride",
             pipeline_override={
-                "WaitStableNode_ForOverride": {"pre_wait_freezes": {"time": 300}}
+                "WaitStableNode_ForOverride": {"pre_wait_freezes": {"time": 30}}
             },
         )
 

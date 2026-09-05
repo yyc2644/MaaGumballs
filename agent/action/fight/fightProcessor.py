@@ -326,6 +326,15 @@ class FightProcessor:
 
         return monster_count > 0
 
+    def _force_residual_monster_clear(self, context: Context) -> bool:
+        """清层收口时补扫五次，避免最后一只怪被误判成已清完。"""
+        detected = False
+        for _ in range(5):
+            if self.checkMonster(context):
+                detected = True
+            time.sleep(0.1)
+        return detected
+
     def cache_door_from_box(
         self,
         box: tuple[int, int, int, int],
@@ -565,7 +574,7 @@ class FightProcessor:
             context.run_task(
                 "WaitStableNode_ForOverride",
                 pipeline_override={
-                    "WaitStableNode_ForOverride": {"pre_wait_freezes": {"time": 30}}
+                    "WaitStableNode_ForOverride": {"pre_wait_freezes": {"time": 8}}
                 },
             )
             logger.debug(
@@ -575,12 +584,20 @@ class FightProcessor:
             if isclearall:
                 # 需要地板全清
                 if fail_check_grid_cnt >= self.max_grid_loop_fail:
+                    if self._force_residual_monster_clear(context):
+                        fail_check_grid_cnt = 0
+                        fail_check_monster_cnt = 0
+                        continue
                     break
             # 如果提前清理完该层，那么不需要继续等待，可以提前退出
             elif (
                 fail_check_monster_cnt >= self.max_monster_loop_fail
                 or fail_check_grid_cnt >= self.max_grid_loop_fail
             ):
+                if self._force_residual_monster_clear(context):
+                    fail_check_grid_cnt = 0
+                    fail_check_monster_cnt = 0
+                    continue
                 break
         logger.info("已完成清理当前层~")
         return True
