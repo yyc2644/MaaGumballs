@@ -38,7 +38,7 @@ class FightProcessor:
             self.monster_grid_lower = [190, 61, 53]
             self.monster_grid_upper = [240, 79, 73]
             self.monster_grid_count = 20
-            self._hit_monster_count = 4
+            self._hit_monster_count = 6
 
             self.max_grid_loop = 20
             self.max_monster_loop_fail = 6
@@ -323,6 +323,7 @@ class FightProcessor:
             # logger.debug(f"攻击怪物({r + 1},{c + 1})，距离门：{monster[0]}")
             for _ in range(self.hit_monster_count):
                 context.tasker.controller.post_click(x + w // 2, y + h // 2).wait()
+                time.sleep(0.1)
 
         return monster_count > 0
 
