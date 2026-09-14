@@ -219,7 +219,7 @@
       ]
     },
     {
-      "name": "拉绳子调试",
+      "name": "91-1201拉绳子调试",
       "entry": "GetKeyFromHole",
       "repeatable": true,
       "repeat_count": 1,
