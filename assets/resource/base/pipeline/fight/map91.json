@@ -1,0 +1,157 @@
+{
+    "Map91_Start": {
+        "recognition": "TemplateMatch",
+        "template": "fight/MazeEntrance/Map91_Entry.png",
+        "roi": [
+            15,
+            161,
+            691,
+            878
+        ],
+        "threshold": 0.8,
+        "action": "Custom",
+        "custom_action": "Fight_PreWar",
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "Map91_Select",
+            "[JumpBack]PowerLack",
+            "[JumpBack]Select_MainWindow",
+            "[JumpBack]ConfirmButton",
+            "[JumpBack]ClickCenterBelow_500ms"
+        ]
+    },
+    "Map91_Select": {
+        "recognition": "OCR",
+        "expected": "进入迷宫",
+        "roi": [
+            165,
+            871,
+            418,
+            91
+        ],
+        "action": "Custom",
+        "custom_action": "Fight_Select",
+        "post_delay": 1000,
+        "timeout": 2000,
+        "next": [
+            "Map91_EntryMaze"
+        ]
+    },
+    "Map91_EntryMaze": {
+        "recognition": "OCR",
+        "expected": "进入迷宫",
+        "roi": [
+            165,
+            871,
+            418,
+            91
+        ],
+        "action": "Click",
+        "next": [
+            "Map91_Fighting",
+            "[JumpBack]GameLoading"
+        ]
+    },
+    "Map91_Fighting": {
+        "recognition": "TemplateMatch",
+        "template": "fight/UniversalUI/MazePackage.png",
+        "action": "Custom",
+        "custom_action": "Map91",
+        "roi": [
+            47,
+            1147,
+            136,
+            117
+        ]
+    },
+    "Map91": {
+        "next": [
+            "Map91_Start",
+            "Map91_Fighting",
+            "[JumpBack]AlchemyReward",
+            "[JumpBack]MapIsTop",
+            "[JumpBack]MapSwipeDownToUp"
+        ]
+    },
+    "Map91_Fight_ClearCurrentLayer": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "Map91_Fight_ClearCurrentLayer",
+        "custom_action_param": {
+            "layers": 1
+        },
+        "post_delay": 300,
+        "timeout": 1000
+    },
+    "Map91_Debug_MonsterPhase": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "Map91_Debug_MonsterPhase",
+        "post_delay": 300,
+        "timeout": 60000
+    },
+    "Map91_Debug_LootPhase": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "Map91_Debug_LootPhase",
+        "post_delay": 300,
+        "timeout": 60000
+    },
+    "Map91_ContinuousMonsterLoop": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "Map91_ContinuousMonsterLoop",
+        "post_delay": 300,
+        "timeout": 60000
+    },
+    "Map91_Debug_FighterSkill": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "Map91_Debug_FighterSkill",
+        "post_delay": 300,
+        "timeout": 60000
+    },
+    "Map91_MonsterPhase": {
+        "recognition": "DirectHit",
+        "enabled": true,
+        "action": "DoNothing"
+    },
+    "Map91_LootPhase": {
+        "recognition": "DirectHit",
+        "enabled": true,
+        "action": "DoNothing"
+    },
+    "Map91_Target_Layer_Setting": {
+        "recognition": "OCR",
+        "expected": "1199"
+    },
+    "Map91_ManualLeave_Setting": {
+        "recognition": "OCR",
+        "expected": "自动结算"
+    },
+    "Map91_VendingShop": {
+        "recognition": "TemplateMatch",
+        "template": "fight/Map91/Building/VendingShop_candidate.png",
+        "roi": [
+            0,
+            190,
+            720,
+            830
+        ],
+        "threshold": 0.82,
+        "timeout": 800
+    },
+    "RoleSkill_Fighter": {
+        "recognition": "TemplateMatch",
+        "template": "fight/RoleSkill/Fighter/格斗家.jpg",
+        "roi": [
+            340,
+            90,
+            380,
+            100
+        ],
+        "threshold": 0.86,
+        "timeout": 1200
+    }
+}

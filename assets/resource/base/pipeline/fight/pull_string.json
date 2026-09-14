@@ -26,6 +26,12 @@
         "custom_action": "GetKeyFromHole_Test",
         "post_delay": 1000
     },
+    "SolveHiddenCavePuzzle": {
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "SolveHiddenCavePuzzle",
+        "post_delay": 1000
+    },
     "FindLeftString": {
         "recognition": "TemplateMatch",
         "template": [

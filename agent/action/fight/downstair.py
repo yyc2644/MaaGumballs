@@ -110,11 +110,24 @@ class FightDownstairManager:
         else:
             key_hole_hit = context.run_recognition("FindKeyHole", img).hit
             if key_hole_hit:
-                downstair_result = "keyhole_manual_wait"
-                logger.warning("检查到神秘的洞穴捏，请冒险者大人检查！！")
-                if self._save_status_before_keyhole_notice(context):
+                downstair_result = "keyhole_auto_attempt"
+                logger.info("检测到神秘洞穴, 尝试自动完成钥匙拼图")
+                opened = context.run_task("FindKeyHole")
+                solved = (
+                    context.run_task("SolveHiddenCavePuzzle") if opened else None
+                )
+                if solved and solved.status.succeeded and context.run_recognition(
+                    "Fight_OpenedDoor",
+                    context.tasker.controller.post_screencap().wait().get(),
+                ).hit:
+                    downstair_result = "keyhole_auto_solved"
+                    logger.info("神秘洞穴拼图已自动完成")
+                    context.run_task("Fight_OpenedDoor")
+                elif self._save_status_before_keyhole_notice(context):
                     downstair_result = "keyhole_save_status_opened_door"
                 else:
+                    downstair_result = "keyhole_manual_wait"
+                    logger.warning("洞穴拼图无法可靠识别，请冒险者大人检查")
                     logger.info("暂离返回后仍需人工处理神秘洞穴, 开始发送外部通知")
                     fightUtils.send_alert("洞穴警告", "发现神秘洞穴，请及时处理！")
                     send_message("洞穴警告", "发现神秘洞穴，请及时处理！")

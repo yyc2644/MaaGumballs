@@ -1,5 +1,6 @@
 from action.fight import jjc101
 from action.fight import getKeyFromHole
+from action.fight import hidden_cave
 from action.fight import timeSpaceDomain
 from action.fight import foreignDomainUtils
 from action.activity import kairo_maze1
@@ -16,7 +17,7 @@ from action.divineForgeLand import someTrick
 
 from action.fight import mars101
 from action.fight import card1201
-from action.fight import sleeptown1201
+from action.fight import map91
 from action.mars import mars_boss
 from action.mars import mars_earth_gate
 from action.mars import mars_events
@@ -30,6 +31,13 @@ from action.card import card_hp
 from action.card import card_settlement
 from action.card import card_special_layer
 from action.card import card_title
+from action.map91 import map91_boss
+from action.map91 import map91_earth_gate
+from action.map91 import map91_events
+from action.map91 import map91_hp
+from action.map91 import map91_settlement
+from action.map91 import map91_special_layer
+from action.map91 import map91_title
 from action.sleeptown import sleeptown_boss
 from action.sleeptown import sleeptown_divine_forge_sequence_agent
 from action.sleeptown import sleeptown_earth_gate

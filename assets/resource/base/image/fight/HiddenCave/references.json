@@ -1,0 +1,12 @@
+[
+    {"name": "string1", "file": "string1.png", "source": "BL", "target": "TR"},
+    {"name": "string2", "file": "string2.png", "source": "BL", "target": "BR"},
+    {"name": "string3", "file": "string3.png", "source": "BL", "target": "TL"},
+    {"name": "string4", "file": "string4.png", "source": "TL", "target": "BL"},
+    {"name": "string5", "file": "string5.png", "source": "BR", "target": "TL"},
+    {"name": "string6", "file": "string6.png", "source": "BL", "target": "BR"},
+    {"name": "purple-key", "file": "purple-key.png", "source": "BR", "target": "TL"},
+    {"name": "blue-ribbon", "file": "blue-ribbon.png", "source": "TR", "target": "TL"},
+    {"name": "red-gear", "file": "red-gear.png", "source": "TR", "target": "BR"},
+    {"name": "coin-key", "file": "coin-key.png", "source": "BR", "target": "TL"}
+]
