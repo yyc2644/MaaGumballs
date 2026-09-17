@@ -47,6 +47,15 @@ class FightDownstairManager:
         context.tasker.controller.post_click(target[0], target[1]).wait()
         return True
 
+    @staticmethod
+    def _has_pull_string_solver(context: Context) -> bool:
+        """当前资源是否提供新版洞穴自动处理入口。"""
+        try:
+            return context.get_node_data("GetKeyFromHole") is not None
+        except Exception:
+            logger.exception("检查新版拉绳子脚本 GetKeyFromHole 时发生异常")
+            return False
+
     def _save_status_before_keyhole_notice(self, context: Context):
         logger.info("检测到神秘洞穴, 先暂离保存并返回迷宫")
         context.run_task("Save_Status")
@@ -96,11 +105,33 @@ class FightDownstairManager:
         else:
             key_hole_hit = context.run_recognition("FindKeyHole", img).hit
             if key_hole_hit:
-                downstair_result = "keyhole_manual_wait"
-                logger.warning("检查到神秘的洞穴捏，请冒险者大人检查！！")
-                if self._save_status_before_keyhole_notice(context):
+                solved = None
+                if self._has_pull_string_solver(context):
+                    downstair_result = "keyhole_auto_attempt"
+                    logger.info(
+                        "检测到神秘洞穴，发现新版拉绳子脚本 GetKeyFromHole，"
+                        "优先尝试自动处理"
+                    )
+                    try:
+                        solved = context.run_task("GetKeyFromHole")
+                    except Exception:
+                        logger.exception("新版拉绳子脚本 GetKeyFromHole 执行异常")
+                else:
+                    logger.info(
+                        "检测到神秘洞穴，但当前资源没有 GetKeyFromHole，"
+                        "沿用原来的通知用户逻辑"
+                    )
+
+                if solved and solved.status.succeeded:
+                    downstair_result = "keyhole_auto_solved"
+                    logger.info("新版拉绳子脚本执行成功，返回主任务继续开门下楼")
+                    context.run_task("Fight_OpenedDoor")
+                elif self._save_status_before_keyhole_notice(context):
                     downstair_result = "keyhole_save_status_opened_door"
                 else:
+                    downstair_result = "keyhole_manual_wait"
+                    if solved is not None:
+                        logger.warning("新版拉绳子脚本未成功，回退到通知用户逻辑")
                     logger.info("暂离返回后仍需人工处理神秘洞穴, 开始发送外部通知")
                     fightUtils.send_alert("洞穴警告", "发现神秘洞穴，请及时处理！")
                     send_message("洞穴警告", "发现神秘洞穴，请及时处理！")

@@ -1,5 +1,6 @@
 from action.fight import jjc101
 from action.fight import getKeyFromHole
+from action.fight import hidden_cave
 from action.fight import timeSpaceDomain
 from action.fight import foreignDomainUtils
 from action.activity import kairo_maze1

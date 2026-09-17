@@ -1,124 +1,97 @@
-from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
-from maa.context import Context
+from __future__ import annotations
+
 import time
-import cv2
+
+from maa.agent.agent_server import AgentServer
+from maa.context import Context
+from maa.custom_action import CustomAction
+
+from action.fight.hidden_cave import (
+    HiddenCaveSolver,
+    drag_key_to_target,
+)
+from utils import logger
+
+
+# 识别重试：刚进洞时可能还在播动画
+ANALYZE_ATTEMPTS = 4
+ANALYZE_INTERVAL = 1.0
+# 拖拽结束后等待画面稳定
+DRAG_SETTLE = 0.6
+# 总轮数：每轮"识别 → 拖第一个候选 → 校验重合"，失败则 OCR 点"返回"
+# 重新进洞再来一轮；3 轮都不达标就返回失败，交由人工处理
+TOTAL_ROUNDS = 3
 
 
 @AgentServer.custom_action("GetKeyFromHole_Test")
 class GetKeyFromHole_Test(CustomAction):
-    # 这里检查钥匙是否可以自动获取
-    def get_distance_from_key_to_target(self, context: Context):
+    """神秘洞穴取钥匙：进洞 → 识别真卷轴与剪影 → 拖拽 → 确定。
 
-        distance = 0
+    识别逻辑在 :class:`action.fight.hidden_cave.HiddenCaveSolver`。拖拽后的
+    刚体残差达标时，通过 OCR 识别并点击“确定”，随后把成功结果交回主流程。
+    """
 
-        img = context.tasker.controller.post_screencap().wait().get()
-        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        _, binary_img = cv2.threshold(gray_img, 40, 255, cv2.THRESH_BINARY)
+    def _solve(self, context: Context):
+        self._last_image = None
+        solver = HiddenCaveSolver()
+        for attempt in range(1, ANALYZE_ATTEMPTS + 1):
+            image = context.tasker.controller.post_screencap().wait().get()
+            solution = solver.analyze(image)
+            if solution is not None:
+                # 拖拽校验需要识别时的参考截图（剪影掩码取自该帧）
+                self._last_image = image
+                return solution
+            logger.warning(f"洞穴拼图第{attempt}次识别失败，稍后重试")
+            time.sleep(ANALYZE_INTERVAL)
+        return None
 
-        # 初始化结果列表
-        pixel_counts = []
-        roi_list = []
-        result_list = []
-
-        # 从右向左遍历，每次左移5个像素
-        for i in range(0, 640, 5):
-            # 计算当前矩形区域坐标
-            x = max(35, 640 - i - 60)  # 确保不超过指定边界
-            y = 575  # 指定位置为绳子坐标
-            w = 60
-            h = 45
-
-            # 确保矩形不超过指定边界
-            if x - w < 35:
-                w = 20 - x
-
-            # 跳过无效的矩形区域
-            if w <= 0 or h <= 0:
-                continue
-
-            # 提取矩形区域
-            roi = binary_img[y : y + h, x - w : x]
-
-            # 统计白色像素点 (255)
-            count = cv2.countNonZero(roi)
-            pixel_counts.append(count)
-            roi_list.append([x, y, w, h])
-
-        for i in range(1, len(pixel_counts) - 1):
-            if pixel_counts[i] <= 1900 and pixel_counts[i - 1] > 1900:
-                result_list.append(roi_list[i])
-                x, y, w, h = roi_list[i]
-
-        if len(result_list) != 2:
-            return distance
-        elif result_list[0][0] >= 500:
-            return distance
-        else:
-            distance = abs(result_list[0][0] - result_list[1][0])
-            print("distance: ", distance, "roi: ", result_list)
-            return distance
-
-    #  两个ROI之间的距离需要优化，拉绳子的步长需要优化
-    # distance:  325 roi:  [[470, 575, 60, 45], [145, 575, 60, 45]]
-    # distance:  200 roi:  [[445, 575, 60, 45], [245, 575, 60, 45]]
-    # distance:  250 roi:  [[440, 575, 60, 45], [190, 575, 60, 45]]
-    # distance:  255 roi:  [[410, 575, 60, 45], [155, 575, 60, 45]]
-    # distance:  240 roi:  [[435, 575, 60, 45], [195, 575, 60, 45]]
-    # 执行函数
     def run(
         self,
         context: Context,
         argv: CustomAction.RunArg,
     ) -> CustomAction.RunResult:
+        # 总流程：识别 → 拖第一个候选 → 重合验证。失败（含程序卡住）时
+        # OCR 找"返回"点击退出，重新进洞识别后再试一轮；共 3 轮。
+        for attempt in range(1, TOTAL_ROUNDS + 1):
+            if attempt > 1:
+                logger.warning(f"第{attempt - 1}轮失败，OCR 点返回后重新进洞重试")
+                backed = context.run_task("BackText")
+                logger.info(f"卡住恢复-OCR点击返回: {bool(backed and backed.status.succeeded)}")
+                time.sleep(1.0)
 
-        context.run_task("FindKeyHole")
-        distance = self.get_distance_from_key_to_target(context)
-        while distance == 0 or distance < 200:
-            context.run_task("BackText")
-            context.run_task("FindKeyHole")
-            distance = self.get_distance_from_key_to_target(context)
+            # 1. 点开洞穴入口；调试入口允许模拟器已经停在洞穴界面
+            entry = context.run_task("FindKeyHole")
+            logger.info(f"洞穴入口识别: {bool(entry and entry.status.succeeded)}")
 
-        print(distance, "如果distance为0或者distance小于200则说明很大概率获取不到钥匙")
-        findleftstringdetail = context.run_task("FindLeftString")
-        if findleftstringdetail:
-            leftstringstart = findleftstringdetail.nodes[0].recognition.box.x
-        print("leftstringstart:", leftstringstart)
+            # 2. 识别真卷轴与目标剪影
+            solution = self._solve(context)
+            if solution is None:
+                logger.warning("洞穴拼图无法可靠识别，准备恢复流程重试")
+                continue
 
-        # 按下button开始移动钥匙，同时检测钥匙是否到达合适位置，即当前检测到的位置
-        # x - leftstringstart = distance
-        button_x = 105
-        button_y = 795
-        now_leftstring = leftstringstart
-        while now_leftstring < leftstringstart + distance:
-            print("now_leftstring: " + str(now_leftstring))
-
-            remaining_distance = leftstringstart + distance - now_leftstring
-            if remaining_distance < 5:  # 容差范围
-                break
-            elif remaining_distance > 200:
-                step = 80  # 远距离大步长
-            elif remaining_distance > 50:
-                step = 30  # 中距离中等步长
-            else:
-                step = 10  # 近距离微调
-
-            # 移动按钮
-            context.tasker.controller.post_swipe(
-                button_x, button_y, button_x + step, button_y, 100
-            ).wait()
-            now_leftstring = (
-                context.run_task("FindLeftString").nodes[0].recognition.box.x
+            # 3. 分段慢拖 + 刚体残差校验，必要时自动微调
+            aligned, residual = drag_key_to_target(
+                context, solution, self._last_image
             )
-            print("move button ", step)
-            # 记录按钮位置
-            button_x += step
+            logger.info(
+                f"洞穴取钥匙拖拽: {solution.source}{solution.source_point} -> "
+                f"{solution.target}{solution.target_point} "
+                f"mode={solution.mode} confidence={solution.confidence:.2f} "
+                f"重合={'达标' if aligned else '未达标'} 最优残差={residual:.0f}px"
+            )
+            time.sleep(DRAG_SETTLE)
 
-        context.run_task("ClickConfirmForKey")
-        time.sleep(3)
+            # 4. 重合达标后 OCR 点击“确定”，成功后交回主流程继续开门下楼
+            if aligned:
+                confirmed = context.run_task("ClickConfirmForKey")
+                if confirmed and confirmed.status.succeeded:
+                    logger.info("重合验证通过，OCR 已点击确定，返回主流程")
+                    return CustomAction.RunResult(success=True)
+                logger.warning("重合验证通过，但 OCR 未识别到确定按钮，准备重试")
+                continue
+            logger.warning("重合验证未达标（已自动微调仍不足），准备返回重试")
 
-        img = context.tasker.controller.post_screencap().wait().get()
-        if context.run_recognition("Fight_ClosedDoor", img).hit:
-            return CustomAction.RunResult(success=False)
-        else:
-            return CustomAction.RunResult(success=True)
+        logger.warning(
+            f"共尝试 {TOTAL_ROUNDS} 轮仍未重合达标，放弃自动取钥匙，请人工处理"
+        )
+        return CustomAction.RunResult(success=False)

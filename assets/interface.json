@@ -448,6 +448,18 @@
             "name": "退出游戏",
             "entry": "StopGumballs",
             "doc": "注意: 该node只在完成所有任务后,仅退出游戏"
+        },
+        {
+            "name": "拉绳子调试",
+            "entry": "GetKeyFromHole",
+            "repeatable": true,
+            "repeat_count": 1,
+            "doc": [
+                "## 拉绳子调试",
+                "- 识别神秘洞穴卷轴与剪影，分段拖拽并自动微调",
+                "- 残差达标后 OCR 点击确定",
+                "- 识别或重合校验失败时最多重试三轮，仍失败再交由人工处理"
+            ]
         }
     ],
     "option": {
